@@ -1,0 +1,82 @@
+
+        body {
+            background: linear-gradient(135deg, #00d4ff, #4c00ff);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            backdrop-filter: blur(8px);
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+        }
+
+        .login-container h2 {
+            color: white;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.3);
+            border: none;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #4c00ff, #00d4ff);
+            border: none;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .btn-login:hover {
+            background: linear-gradient(135deg, #00d4ff, #4c00ff);
+            transform: scale(1.05);
+        }
+        .links-section a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .links-section a:hover {
+            text-decoration: underline;
+        }
+
+        .social-login {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 1rem;
+        }
+
+        .social-login a {
+            color: white;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .social-login a:hover {
+            transform: scale(1.2);
+        }
+        a{
+            cursor: pointer;
+        }
