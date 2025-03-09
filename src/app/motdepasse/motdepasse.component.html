@@ -3,31 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page - Glassmorphism</title>
+    <title>Mot de passe oublier</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
 </head>
 <body>
     <div class="login-container">
         <img src="logo.png" alt="Logo TT" width="150">
-        <h2>CHANGER VOTRE MOT DE PASSE</h2>
-        <form>
+        <h2>Réinitialiser votre Mot De Passe</h2>
+        <form (ngSubmit)="validerMotDePasse()" #form="ngForm">
             <div class="mb-3">
-                <input type="mdp" class="form-control" placeholder="Nouveau Mot de passe ">
-            </div>
-            <div class="mb-3">
-                <input type="Cmdp" class="form-control" placeholder="Confirmation Mot de passe">
-            </div>
-            <button type="Confirmer" class="btn btn-login">CONFIRMER</button>
-            <div class="links-section mt-3">
-                <div class="links-section mt-3">
-                    <a routerLink="/">Retour à la connexion</a>
+                <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Identifiant"
+                    [(ngModel)]="identifiant"
+                    name="identifiant"
+                    required
+                />
+                <div *ngIf="messageErreurIdentifiant" class="text-danger">
+                    {{ messageErreurIdentifiant }}
                 </div>
-                
             </div>
+            <div class="mb-3">
+                <input
+                    type="password"
+                    class="form-control"
+                    placeholder="Nouveau Mot de passe"
+                    [(ngModel)]="nouveauMotDePasse"
+                    name="nouveauMotDePasse"
+                    required
+                />
+                <div *ngIf="messageErreurMdp" class="text-danger">
+                    {{ messageErreurMdp }}
+                </div>
+            </div>
+            <div class="mb-3">
+                <input
+                    type="password"
+                    class="form-control"
+                    placeholder="Confirmation Mot de passe"
+                    [(ngModel)]="confirmationMotDePasse"
+                    name="confirmationMotDePasse"
+                    required
+                />
+                <div *ngIf="messageErreurConfirmation" class="text-danger">
+                    {{ messageErreurConfirmation }}
+                </div>
+            </div>
+            <button
+                type="submit"
+                class="btn btn-login"
+            >
+            Réinitialiser
+            </button>
+            <a class="links-section" (click)="login()" routerLink="login">Retour à la connexion</a>
         </form>
-        
     </div>
 </body>
 </html>
