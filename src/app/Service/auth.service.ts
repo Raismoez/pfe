@@ -72,6 +72,9 @@ export class AuthService {
         case 401:
           errorMessage = 'Non autorisé. Vérifiez vos identifiants';
           break;
+        case 403:
+          errorMessage = error.error?.message || 'Compte inactif. Veuillez contacter l\'administrateur';
+          break;
         case 404:
           errorMessage = 'Utilisateur non trouvé';
           break;

@@ -58,7 +58,7 @@
               <th>Nom d'utilisateur</th>
               <th>E-mail</th>
               <th>Rôle</th>
-              <th>Status</th>
+              <th>Statut</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -67,7 +67,7 @@
               <td>{{ user.identifiant }}</td>
               <td>{{ user.nomUtilisateur }}</td>
               <td>{{ user.email }}</td>
-              <td>{{ user.idRole }}</td>
+              <td>{{ getRole(user.idRole) }}</td>
             <td>
             <span [ngClass]="user.statut === 'Actif' ? 'statut-actif' : 'statut-inactif'">
              {{ user.statut }}

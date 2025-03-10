@@ -19,6 +19,7 @@ export class LoginComponent implements OnInit {
   // Messages d'erreur
   messageErreurIdentifiant: string = '';
   messageErreurPassword: string = '';
+  messageErreurGeneral: string='';
   
   // Constantes pour les rôles (à adapter selon votre système)
   private ROLE_ADMIN = 1;
@@ -99,6 +100,9 @@ export class LoginComponent implements OnInit {
           this.messageErreurIdentifiant = errorMessage;
         } else {
           this.messageErreurPassword = errorMessage;
+        }
+        if (error.status === 403) {
+          this.messageErreurGeneral = errorMessage;
         }
       }
     });

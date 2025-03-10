@@ -12,6 +12,9 @@
         <img src="logo.png" alt="Logo TT" width="150">
         <h2>Bienvenue!</h2>
         <form (ngSubmit)="onSubmit()">
+            <div *ngIf="messageErreurGeneral" class="alert alert-danger mb-3">
+                {{ messageErreurGeneral }}
+            </div>
             <div class="mb-3">
                 <input type="text" 
                        class="form-control" 

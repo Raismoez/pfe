@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { User, UserService } from '../Service/user.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-user-list',
@@ -28,11 +29,23 @@ export class UserListComponent implements OnInit {
     password: '' 
   };
   
-  constructor(private userService: UserService) {}
+ 
+  
+  
+  constructor(private router: Router, private userService: UserService) {}
   
   ngOnInit() {
     this.loadUsers();
   }
+  
+  
+  getRole(idRole: any): string {
+    if (idRole == 1) return 'Admin';
+    if (idRole == 2) return 'Agent commercial';
+    if (idRole == 3) return 'Agent technique';
+    return 'Rôle inconnu';
+  }
+  
   
   loadUsers() {
     this.userService.getAllUsers().subscribe(
@@ -146,8 +159,9 @@ export class UserListComponent implements OnInit {
     this.showUserModal = false;
   }
   
-  logout(event: Event) {
-    event.preventDefault();
-    // Ajouter la logique de déconnexion ici
+  logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('identifiant');
+    this.router.navigate(['/']);
   }
 }
