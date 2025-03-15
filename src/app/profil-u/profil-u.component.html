@@ -1,40 +1,9 @@
-<div class="app-container">
-  <div class="sidebar">
-    <div class="logo">
-      <h2>Tunisie Telecom Biblio</h2>
-      <p>Utilisateur</p>
-    </div>
-    <nav>
-      <ul>
-        <li><a href="#" class="active"><i class="fas fa-user"></i> Profil</a></li>
-        <li><a href="#"><i class="fas fa-chart-line"></i> Tableau de bord</a></li>
-        <li><a href="#"><i class="fas fa-shopping-cart"></i> Catalogue des offres</a></li>
-        <li><a href="#"><i class="fas fa-box"></i> Stock</a></li>
-        <li class="logout"><a href="#" (click)="logout()"><i class="fas fa-sign-out-alt"></i> Déconnexion</a></li>
-      </ul>
-    </nav>
-  </div>
+<app-sidebar></app-sidebar>
 
-  <main class="main-content">
-    <header class="top-header">
-      <div class="search-bar">
-        <i class="fas fa-search"></i>
-        <input type="text" placeholder="Rechercher..." />
-      </div>
-      <div class="user-menu">
-        <div class="notifications">
-          <i class="fas fa-bell"></i>
-          <span class="badge">3</span>
-        </div>
-        <div class="messages">
-          <i class="fas fa-envelope"></i>
-          <span class="badge">5</span>
-        </div>
-        <div>
-          <img src="logo.png" alt="TT" width="60" />
-        </div>
-      </div>
-    </header>
+<main class="main-content">
+ <app-header></app-header>
+
+
 
     <div class="profile-container">
       <h1>Bienvenue, {{ userProfile?.nomUtilisateur || 'Utilisateur' }}!</h1>

@@ -3,7 +3,9 @@
     min-height: 100vh;
     background: #f6f9ff;
 }
-
+.content-header{
+    width: 100%;
+}
 .sidebar {
     background: linear-gradient(135deg, #00d4ff, #4c00ff);
     color: white;
@@ -61,15 +63,23 @@ nav ul li a i {
     margin-left: 250px;
     padding: 20px;
 }
-
+.bloc-profile{
+    text-align: end
+}
+.profile-image{
+    border-radius: 50%;
+    align-items: center;
+    cursor: pointer;
+}
 .top-header {
     background: white;
     padding: 15px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: -20px -20px 20px;
+    margin: -20px -20px 20px -45px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    
 }
 
 .search-bar {
@@ -98,27 +108,7 @@ nav ul li a i {
     display: flex;
     align-items: center;
     gap: 20px;
-}
-
-.notifications, .messages {
-    position: relative;
-    cursor: pointer;
-}
-
-.notifications i, .messages i {
-    font-size: 18px;
-    color: #6c757d;
-}
-
-.badge {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    background: #dc3545;
-    color: white;
-    font-size: 10px;
-    padding: 2px 5px;
-    border-radius: 10px;
+    justify-content: end;
 }
 
 .content-container {
@@ -133,25 +123,62 @@ nav ul li a i {
 }
 
 .page-header h1 {
-    font-size: 22px;
+    font-size: 35px;
+    color:#4154f1;
 }
 
 .table-responsive table {
     width: 100%;
     border-collapse: collapse;
+    border: 1px solid #ddd;
+    color: black;
 }
 
 .table-responsive th, .table-responsive td {
     padding: 12px;
     text-align: left;
+    border: 1px solid #ddd; 
 }
 
+.table-responsive thead tr {
+    background-color: #007bff;
+    color: white; 
+}
 
+.table-responsive tbody tr:nth-child(even) {
+    background-color: #f2f2f2; 
+}
 
 .table-responsive td button {
     padding: 5px 10px;
     font-size: 14px;
+    border: none;
+    cursor: pointer;
+    margin-right: 10px;
 }
+
+.icon-btn {
+    background-color: #28a745; 
+    color: white;
+}
+
+.icon-btn.danger {
+    background-color: #dc3545; /
+}
+
+.icon-btn.block-btn {
+    background-color: #ffc107; 
+}
+
+.icon-btn.unblock-btn {
+    background-color: #4154f1;
+}
+
+/* Effet au survol */
+.icon-btn:hover {
+    opacity: 0.8;
+}
+
 
 .modal {
     position: fixed;
@@ -216,14 +243,9 @@ nav ul li a i {
     background: #3445c3;
 }
 
-.btn.secondary {
-    background: #6c757d;
-    color: white;
-}
 
-.btn.secondary:hover {
-    background: #5a6268;
-}
+
+
 .statut-actif {
     color: #28a745;
     font-weight: bold;
@@ -233,3 +255,14 @@ nav ul li a i {
     color: #dc3545;
     font-weight: bold;
   }
+/* Style pour l'input valide et invalide */
+.invalid {
+    border: 2px solid red; /* Bordure rouge pour un identifiant invalide */
+  }
+  
+  .valid {
+    border: 2px solid green; /* Bordure verte pour un identifiant valide */
+  }
+  
+  /* Vous pouvez ajouter d'autres styles ici pour personnaliser votre modal ou formulaire */
+  

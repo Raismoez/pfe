@@ -1,13 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { ProfileService } from '../Service/profil.service';
+import { SidebarComponent } from '../components/sidebar/sidebar.component';
+import { HeaderComponent } from '../components/header/header.component';
 
 @Component({
   selector: 'app-profilA',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule,RouterModule,SidebarComponent,HeaderComponent],
   templateUrl: './profilA.component.html',
   styleUrls: ['./profilA.component.css']
 })
@@ -19,6 +21,7 @@ export class profilAComponent implements OnInit {
     role: '',
     avatarUrl: ''
   };
+  public user = JSON.parse(sessionStorage.getItem("user") || '{}');
 
   originalProfile: any = {};
   
@@ -70,7 +73,7 @@ export class profilAComponent implements OnInit {
     this.profileService.getUserProfile(identifiant).subscribe({
       next: (data) => {
         console.log('Profil chargé avec succès:', data);
-        
+        sessionStorage.setItem("user",JSON.stringify(data))
         // Ensure avatar URL is properly formatted
         let avatarUrl = data.avatarUrl || '';
         // If the URL is not empty and doesn't start with http or data: (for preview)
@@ -302,6 +305,7 @@ export class profilAComponent implements OnInit {
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('identifiant');
+    sessionStorage.removeItem('user');
     this.router.navigate(['/']);
   }
 

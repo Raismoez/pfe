@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ProfileService } from '../Service/profil.service';
+import { SidebarComponent } from '../components/sidebar/sidebar.component';
+import { HeaderComponent } from '../components/header/header.component';
 
 @Component({
   selector: 'app-profilu',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule,SidebarComponent,HeaderComponent],
   templateUrl: './profil-u.component.html',
   styleUrls: ['./profil-u.component.css']
 })
@@ -19,6 +21,7 @@ export class ProfilUComponent implements OnInit {
     role: '',
     avatarUrl: ''
   };
+  public user = JSON.parse(sessionStorage.getItem("user") || '{}');
 
   originalProfile: any = {};
   
@@ -300,6 +303,7 @@ export class ProfilUComponent implements OnInit {
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('identifiant');
+    sessionStorage.removeItem('user');
     this.router.navigate(['/']);
   }
 
