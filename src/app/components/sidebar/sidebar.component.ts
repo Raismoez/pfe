@@ -12,9 +12,11 @@ export class SidebarComponent {
   constructor(
     private router : Router,
   ){}
+  public user = JSON.parse(sessionStorage.getItem("user") || '{}');
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('identifiant');
+    sessionStorage.removeItem('user');
     this.router.navigate(['/']);
   }
 }

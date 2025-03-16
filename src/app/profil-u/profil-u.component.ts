@@ -256,8 +256,8 @@ export class ProfilUComponent implements OnInit {
     if (!this.newPassword) {
       this.passwordError.newPassword = 'Le nouveau mot de passe est requis';
       isValid = false;
-    } else if (this.newPassword.length < 6) {
-      this.passwordError.newPassword = 'Le mot de passe doit contenir au moins 6 caractères';
+    } else if (this.newPassword.length < 8) {
+      this.passwordError.newPassword = 'Le mot de passe doit contenir au moins 8 caractères';
       isValid = false;
     }
 
@@ -300,12 +300,7 @@ export class ProfilUComponent implements OnInit {
     });
   }
 
-  logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('identifiant');
-    sessionStorage.removeItem('user');
-    this.router.navigate(['/']);
-  }
+ 
 
   showMessage(message: string) {
     this.toast.message = message;

@@ -163,7 +163,7 @@ nav ul li a i {
 }
 
 .icon-btn.danger {
-    background-color: #dc3545; /
+    background-color: #dc3545; 
 }
 
 .icon-btn.block-btn {
@@ -257,12 +257,16 @@ nav ul li a i {
   }
 /* Style pour l'input valide et invalide */
 .invalid {
-    border: 2px solid red; /* Bordure rouge pour un identifiant invalide */
+    border: 2px solid red !important;
+}
+
+.valid {
+    border: 2px solid green !important;
+}
+.alert {
+    color: red;
+    font-size: 12px;
+    margin-top: 5px;
+    font-weight: 500;
   }
-  
-  .valid {
-    border: 2px solid green; /* Bordure verte pour un identifiant valide */
-  }
-  
-  /* Vous pouvez ajouter d'autres styles ici pour personnaliser votre modal ou formulaire */
   

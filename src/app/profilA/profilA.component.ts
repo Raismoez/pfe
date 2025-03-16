@@ -21,7 +21,7 @@ export class profilAComponent implements OnInit {
     role: '',
     avatarUrl: ''
   };
-  public user = JSON.parse(sessionStorage.getItem("user") || '{}');
+  
 
   originalProfile: any = {};
   
@@ -46,6 +46,7 @@ export class profilAComponent implements OnInit {
   };
 
   selectedFile: File | null = null;
+  user: any;
 
   constructor(
     private router: Router,
@@ -74,6 +75,8 @@ export class profilAComponent implements OnInit {
       next: (data) => {
         console.log('Profil chargé avec succès:', data);
         sessionStorage.setItem("user",JSON.stringify(data))
+        this.user = JSON.parse(sessionStorage.getItem("user") || '{}');
+
         // Ensure avatar URL is properly formatted
         let avatarUrl = data.avatarUrl || '';
         // If the URL is not empty and doesn't start with http or data: (for preview)
@@ -258,8 +261,8 @@ export class profilAComponent implements OnInit {
     if (!this.newPassword) {
       this.passwordError.newPassword = 'Le nouveau mot de passe est requis';
       isValid = false;
-    } else if (this.newPassword.length < 6) {
-      this.passwordError.newPassword = 'Le mot de passe doit contenir au moins 6 caractères';
+    } else if (this.newPassword.length < 8) {
+      this.passwordError.newPassword = 'Le mot de passe doit contenir au moins 8 caractères';
       isValid = false;
     }
 
@@ -302,12 +305,7 @@ export class profilAComponent implements OnInit {
     });
   }
 
-  logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('identifiant');
-    sessionStorage.removeItem('user');
-    this.router.navigate(['/']);
-  }
+
 
   showMessage(message: string) {
     this.toast.message = message;

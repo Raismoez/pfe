@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { User, UserService } from '../Service/user.service';
 import { Router, RouterModule } from '@angular/router';
-
+import { SidebarComponent } from '../components/sidebar/sidebar.component';
+import { HeaderComponent } from '../components/header/header.component';
 @Component({
   selector: 'app-user-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule, RouterModule],
+  imports: [CommonModule, FormsModule, HttpClientModule, RouterModule,SidebarComponent,HeaderComponent],
   templateUrl: './user-list.component.html',
   styleUrls: ['./user-list.component.css']
 })
@@ -167,16 +168,8 @@ deleteUser(userId: number) {
   }
 }
 
-  // Fermer la modal
+  
   closeUserModal() {
     this.showUserModal = false;
-  }
-
-  // Déconnexion de l'utilisateur
-  logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('identifiant');
-    sessionStorage.removeItem('user');
-    this.router.navigate(['/']);
   }
 }

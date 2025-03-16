@@ -1,40 +1,8 @@
-<div class="app-container">
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <div class="logo">
-      <img src="logo.png" alt="TT" width="60%">
-    </div>
-    <nav>
-      <ul>
-        <li><a routerLink="/dashboard"><i class="fas fa-chart-line"></i> Tableau de bord</a></li>
-        <li><a routerLink="/users" class="active"><i class="fas fa-users"></i> Utilisateurs</a></li>
-        <li><a routerLink="/catalog"><i class="fas fa-shopping-cart"></i> Catalogue des offres</a></li>
-        <li><a routerLink="/stock"><i class="fas fa-box"></i> Stock</a></li>
-        <li class="logout"><a href="" (click)="logout()"><i class="fas fa-sign-out-alt"></i> Déconnexion</a></li>
-      </ul>
-    </nav>
-  </div>
+  <app-sidebar></app-sidebar>
+    <main class="main-content">
+      <app-header></app-header>
 
-  <!-- Contenu principal -->
-  <main class="main-content">
-    <!-- En-tête -->
-    <header class="top-header">
-      <div class="row content-header">
-        <div class="col-10">
-          <div class="search-bar">
-            <i class="fas fa-search"></i>
-            <input type="text" placeholder="Rechercher un utilisateur..." [(ngModel)]="searchQuery" (input)="onSearch()">
-          </div>
-        </div>
-        <div class="col-2 bloc-profile">
-          <div class="user-menu">
-              <img routerLink ="/profilA" [src]="user.avatarUrl" alt="Avatar"class="profile-image"  width="25%"/>  
-        </div>
-        </div>
-      </div>
 
-      
-    </header>
 
     <!-- Contenu de la page -->
     <div class="content-container">
@@ -111,7 +79,7 @@
   />
   
   <!-- Alerte pour l'ajout si identifiant ne respecte pas les critères -->
-  <div *ngIf="!editMode && identifiantInput.invalid && identifiantInput.touched" class="alert" color="red">
+  <div *ngIf="!editMode && identifiantInput.invalid && identifiantInput.touched" class="alert" >
     L'identifiant doit contenir exactement 10 caractères et être composé uniquement de lettres et de chiffres.
   </div>
 </div>
@@ -123,19 +91,22 @@
         </div>
   
 <div class="info-group">
-  <label>E-mail</label>
-  <input 
-    type="email" 
-    [(ngModel)]="currentUser.email" 
-    name="email" 
-    required 
-    #emailInput="ngModel"
-    [ngClass]="{ 'invalid': emailInput.invalid && emailInput.touched }"
-    [pattern]="'^[a-zA-Z0-9._%+-]+&#64;[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'" />
-
- 
-  <div *ngIf="emailInput.invalid && emailInput.touched" class="alert">
-    L'email doit être valide et contenir un '&#64;'
+  <div class="info-group">
+    <label>E-mail</label>
+    <input 
+      type="email" 
+      [(ngModel)]="currentUser.email" 
+      name="email" 
+      required 
+      email
+      #emailInput="ngModel"
+      [ngClass]="{ 'invalid': emailInput.invalid && emailInput.touched }"
+    />
+    
+    <div *ngIf="emailInput.invalid && (emailInput.dirty || emailInput.touched)" class="alert" >
+      <span *ngIf="emailInput.errors?.['required']">L'email est requis</span>
+      <span *ngIf="emailInput.errors?.['email']">Veuillez entrer une adresse email valide</span>
+    </div>
   </div>
 </div>
 
@@ -159,7 +130,7 @@
         </div>
   
         <div class="modal-buttons">
-          <button type="submit" class="btn primary" [disabled]="identifiantInput.invalid && !editMode">
+          <button type="submit" class="btn primary" [disabled]="(identifiantInput.invalid && !editMode) || emailInput.invalid">
             {{ editMode ? 'Enregistrer' : 'Ajouter' }}
           </button>
           <button type="button" class="btn secondary" (click)="closeUserModal()">Annuler</button>
@@ -167,4 +138,3 @@
       </form>
     </div>
   </div>
-</div>
