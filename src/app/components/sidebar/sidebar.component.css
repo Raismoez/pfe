@@ -1,53 +1,48 @@
-
-
 .sidebar {
-    background: linear-gradient(135deg, #00d4ff, #4c00ff);
-    color: white;
-    width: 250px;
-    height: 100vh;
-    padding: 20px 0;
-    position: fixed;
-    
+  background: linear-gradient(135deg, #00d4ff, #4c00ff);
+  color: white;
+  width: 250px;
+  height: 100vh;
+  padding: 20px 0;
+  position: fixed;
+  
   }
   
   .logo {
-    padding: 10px 20px;
-    margin-bottom: 30px;
-    
+  padding: 10px 20px;
+  margin-bottom: 30px;
+  
   }
   .logo:hover img {
-    transform: scale(1.05);
-}
-  
-
-
+  transform: scale(1.05);
+  }
   
   nav ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
   }
   
   nav ul li a {
-    color: white;
-    text-decoration: none;
-    padding: 12px 20px;
-    display: block;
-    font-size: 14px;
-    transition: background 0.3s;
+  color: white;
+  text-decoration: none;
+  padding: 12px 20px;
+  display: block;
+  font-size: 14px;
+  transition: background 0.3s;
   }
   
   nav ul li a:hover,
   nav ul li a.active {
-    background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.1);
   }
   
   nav ul li a i {
-    margin-right: 10px;
-    width: 20px;
-    text-align: center;
+  margin-right: 10px;
+  width: 20px;
+  text-align: center;
   }
   
   .logout {
-    margin-top: 300px;
+  margin-top: 300px;
   }

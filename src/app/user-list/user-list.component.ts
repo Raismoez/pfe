@@ -172,4 +172,37 @@ deleteUser(userId: number) {
   closeUserModal() {
     this.showUserModal = false;
   }
+ 
+
+showDeleteConfirmation: boolean = false;
+userToDelete: User | null = null;
+
+
+confirmDelete(user: User): void {
+  this.userToDelete = user;
+  this.showDeleteConfirmation = true;
+}
+
+
+deleteUserConfirmed(): void {
+  if (this.userToDelete) {
+    this.userService.deleteUser(this.userToDelete.id).subscribe(
+      () => {
+        this.users = this.users.filter(u => u.id !== this.userToDelete?.id);
+        this.filteredUsers = [...this.users];
+        this.cancelDelete();
+      },
+      (error) => {
+        console.error('Erreur lors de la suppression', error);
+        this.cancelDelete();
+      }
+    );
+  }
+}
+
+cancelDelete(): void {
+  this.showDeleteConfirmation = false;
+  this.userToDelete = null;
+}
+
 }
