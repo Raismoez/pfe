@@ -1,0 +1,106 @@
+<app-sidebar></app-sidebar>
+
+<main class="main-content">
+  <app-header></app-header>
+  
+  <div class="page-header">
+    <h1>Tableau de Bord </h1>
+    <div class="actions">
+      <button class="btn" (click)="refreshData()"><i class="fas fa-sync"></i> Actualiser</button>
+    </div>
+  </div>
+
+  <div class="chart-card stats-summary">
+    <div class="card-header">
+     
+    </div>
+    <div class="chart-container">
+      <canvas id="statsBarChart"></canvas>
+    </div>
+  </div>
+
+  
+    <div class="chart-card">
+      <div class="card-header">
+        <h3>Évolution des stocks</h3>
+        <div class="card-controls">
+          <select [(ngModel)]="selectedPeriod" (change)="updateChartData()">
+            <option value="day">Jour</option>
+            <option value="week">Semaine</option>
+            <option value="month">Mois</option>
+          </select>
+        </div>
+      </div>
+      <div class="chart-container">
+        <canvas id="stockChart"></canvas>
+      </div>
+    </div>
+    
+    
+    <div class="charts-container">
+    <div class="chart-card">
+      <div class="card-header">
+        <h3>Répartition par catégorie</h3>
+      </div>
+      <div class="chart-container">
+        <canvas id="categoryChart"></canvas>
+      </div>
+    </div>
+  
+
+  <div class="charts-container">
+    <div class="chart-card">
+      <div class="card-header">
+        <h3>Répartition par constructeur</h3>
+      </div>
+      <div class="chart-container">
+        <canvas id="constructeurChart"></canvas>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <div class="recent-products">
+    <div class="section-header">
+      <h2>Articles en stock</h2>
+      <a href="#" class="view-all">Voir tout</a>
+    </div>
+    <div class="products-grid">
+      <div class="product-card" *ngFor="let product of stockItems">
+        <div class="product-header">
+          <span class="product-id">{{ product.id }}</span>
+          <span class="status" [ngClass]="getStatusClass(product.quantity)">
+            {{ getStatusText(product.quantity) }}
+          </span>
+        </div>
+        <div class="product-content">
+          <h3 class="product-name">{{ product.name }}</h3>
+          <div class="product-category">
+            <i class="fas" [ngClass]="getCategoryIcon(product.category)"></i> {{ product.category }}
+          </div>
+          <div class="product-category">
+            <i class="fas" [ngClass]="getManufacturerIcon(product.constructeur)"></i> {{ product.constructeur }}
+          </div>
+          <div class="product-details">
+            <div class="detail-item">
+              <span class="detail-label">Quantité:</span>
+              <span class="detail-value">{{ product.quantity }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="alerts-section" *ngIf="lowStockAlerts.length > 0">
+    <div class="section-header">
+      <h2>Alertes de stock</h2>
+    </div>
+    <div class="alerts-container">
+      <div class="alert" *ngFor="let alert of lowStockAlerts">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>{{ alert.message }}</span>
+      </div>
+    </div>
+  </div>
+</main>

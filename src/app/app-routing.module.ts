@@ -5,7 +5,7 @@ import { MotdepasseComponent } from './motdepasse/motdepasse.component';
 import { profilAComponent } from './profilA/profilA.component';
 import { UserListComponent } from './user-list/user-list.component';
 import { ProfilUComponent } from './profil-u/profil-u.component';
-
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 const routes: Routes = [
   { path: '', component: LoginComponent }, 
@@ -13,6 +13,7 @@ const routes: Routes = [
   { path: 'profilA', component: profilAComponent },
   { path: 'list', component: UserListComponent },
   { path: 'profilU', component: ProfilUComponent },
+  { path: 'dashboard', component: DashboardComponent },
 
 ];
 
