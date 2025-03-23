@@ -43,12 +43,7 @@ export class DashboardComponent implements OnInit {
       icon: 'fa-building',
       color: '#17a2b8'
     },
-    {
-      title: 'Alertes',
-      value: '5',
-      icon: 'fa-exclamation-triangle',
-      color: '#ffc107'
-    }
+    
   ];
   
   // Articles en stock
@@ -135,91 +130,85 @@ export class DashboardComponent implements OnInit {
   
   // Création du graphique en barres pour les statistiques
   createStatsBarChart(): void {
-    const ctx = document.getElementById('statsBarChart') as HTMLCanvasElement;
+  const ctx = document.getElementById('statsBarChart') as HTMLCanvasElement;
+  
+  if (ctx) {
+    // Données de mouvements de stock par mois
+    const labels = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin'];
     
-    if (ctx) {
-      // Données de mouvements de stock par mois
-      const labels = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin'];
-      
-      this.statsBarChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: labels,
-          datasets: [
-            {
-              label: 'Entrées',
-              data: [5, 8, 3, 10, 6, 4],
-              backgroundColor: 'rgba(74, 108, 247, 0.7)',
-              borderColor: '#4a6cf7',
-              borderWidth: 1
-            },
-            {
-              label: 'Sorties',
-              data: [3, 5, 2, 7, 4, 2],
-              backgroundColor: 'rgba(255, 193, 7, 0.7)',
-              borderColor: '#ffc107',
-              borderWidth: 1
-            },
-            {
-              label: 'Balance',
-              data: [2, 3, 1, 3, 2, 2],
-              backgroundColor: 'rgba(40, 167, 69, 0.7)',
-              borderColor: '#28a745', 
-              borderWidth: 1
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: {
-              beginAtZero: true,
-              title: {
-                display: true,
-                text: 'Nombre d\'articles'
-              }
-            },
-            x: {
-              title: {
-                display: true,
-                text: 'Mois'
-              }
-            }
+    this.statsBarChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Entrées',
+            data: [5, 8, 3, 10, 6, 4],
+            backgroundColor: 'rgba(74, 108, 247, 0.7)',
+            borderColor: '#4a6cf7',
+            borderWidth: 1
           },
-          plugins: {
-            legend: {
-              display: true,
-              position: 'top'
-            },
+          {
+            label: 'Sorties',
+            data: [3, 5, 2, 7, 4, 2],
+            backgroundColor: 'rgba(255, 193, 7, 0.7)',
+            borderColor: '#ffc107',
+            borderWidth: 1
+          },
+        
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
             title: {
               display: true,
-              text: 'Bilan des mouvements de stock S1 2025',
-              font: {
-                size: 16,
-                weight: 'bold'
-              }
-            },
-            tooltip: {
-              callbacks: {
-                footer: (tooltipItems) => {
-                  // Calculer le total pour chaque mois
-                  const datasetIndex = tooltipItems[0].datasetIndex;
-                  const index = tooltipItems[0].dataIndex;
-                  
-                  if (datasetIndex === 2) { // Pour la Balance uniquement
-                    const entrees = labels[index] + ': ' + tooltipItems[0].dataset.data[index] + ' articles en solde positif';
-                    return entrees;
-                  }
-                  return '';
+              text: 'Nombre d\'articles'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Mois'
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top'
+          },
+          title: {
+            display: true,
+            text: 'Bilan des mouvements de stock ',
+            font: {
+              size: 16,
+              weight: 'bold'
+            }
+          },
+          tooltip: {
+            callbacks: {
+              footer: (tooltipItems) => {
+                // Calculer le total pour chaque mois
+                const datasetIndex = tooltipItems[0].datasetIndex;
+                const index = tooltipItems[0].dataIndex;
+                
+                if (datasetIndex === 2) { // Pour la Balance uniquement
+                  const entrees = labels[index] + ': ' + tooltipItems[0].dataset.data[index] + ' articles en solde positif';
+                  return entrees;
                 }
+                return '';
               }
             }
           }
         }
-      });
-    }
+      }
+    });
   }
+}
   
   // Création du graphique d'évolution des stocks
   createStockChart(): void {
