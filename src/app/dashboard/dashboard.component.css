@@ -18,18 +18,11 @@
 }
 
 .page-title {
-  color: var(--primary-color);
-  font-size: 24px;
-  margin: 0;
+  font-weight: 600;
+    color:#4154f1;
 }
 
-.search-input {
-  width: 300px;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size: 16px;
-}
+
 
 .summary-grid {
   display: grid;
