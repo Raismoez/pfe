@@ -1,143 +1,102 @@
-<app-sidebar></app-sidebar>
-<main class="main-content">
-  <app-header></app-header>
-
-  <!-- Contenu de la page -->
-  <div class="content-container">
-    <div class="page-header">
-      <h1>Gestion de stock</h1>
-      <button class="btn primary" (click)="openAddUserModal()">
-        <i class="fas fa-user-plus"></i> A
-      </button>
+<div class="main-container">
+  <app-sidebar></app-sidebar>
+  
+  <main class="main-content">
+    <div class="search-container">
+      <div class="search-bar">
+        <i class="fas fa-search"></i>
+        <input type="text" placeholder="Rechercher un article...">
+      </div>
+      <img src="assets/images/avatar.png" alt="Avatar" class="avatar">
     </div>
 
-    <!-- Tableau des utilisateurs -->
-    <div class="table-responsive">
-      <table>
-        <thead>
-          <tr>
-            <th>Identifiant</th>
-            <th>Nom d'utilisateur</th>
-            <th>E-mail</th>
-            <th>Rôle</th>
-            <th>Statut</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let user of filteredUsers">
-            <td>{{ user.identifiant }}</td>
-            <td>{{ user.nomUtilisateur }}</td>
-            <td>{{ user.email }}</td>
-            <td>{{ getRole(user.idRole) }}</td>
-            <td>
-              <span [ngClass]="user.statut === 'Actif' ? 'statut-actif' : 'statut-inactif'">
-                {{ user.statut }}
-              </span>
-            </td>
-            <td>
-              <button class="btn icon-btn" (click)="editUser(user)">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="btn icon-btn danger" (click)="confirmDelete(user)">
-                <i class="fas fa-trash"></i>
-              </button>
-              <button class="btn icon-btn" [ngClass]="user.statut === 'Actif' ? 'block-btn' : 'unblock-btn'" (click)="blockUser(user.id)">
-                <i class="fas" [ngClass]="user.statut === 'Actif' ? 'fa-ban' : 'fa-unlock'"></i>
-              </button>
-            </td>
-          </tr>
-          <tr *ngIf="filteredUsers.length === 0">
-            <td colspan="6">Aucun utilisateur trouvé.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</main>
+    <div class="content-wrapper">
+      <div class="page-header">
+        <h1>Liste des articles</h1>
+        <button class="btn-add">Ajouter un article</button>
+      </div>
 
-<!-- Modal utilisateur -->
-<div class="modal" *ngIf="showUserModal">
-  <div class="modal-content">
-    <h2>{{ editMode ? 'Modifier' : 'Ajouter' }} un utilisateur</h2>
-    <form (ngSubmit)="onSubmitUserForm()">
-      <!-- Champ identifiant avec la validation -->
-      <div class="info-group">
-        <label>Identifiant</label>
-        <input 
-          type="text" 
-          [(ngModel)]="currentUser.identifiant" 
-          name="identifiant" 
-          required 
-          [readonly]="editMode"
-          #identifiantInput="ngModel"
-          [ngClass]="{ 'invalid': identifiantInput.invalid && identifiantInput.touched }"
-          [pattern]="'^[a-zA-Z0-9]{10}$'" 
-        />
-        
-        <div *ngIf="!editMode && identifiantInput.invalid && identifiantInput.touched" class="alert">
-          L'identifiant doit contenir exactement 10 caractères et être composé uniquement de lettres et de chiffres.
+      <div class="content-container">
+        <!-- Form Section -->
+        <div class="form-section">
+          <h3>Ajouter un article</h3>
+          <form>
+            <div class="form-group">
+              <label>Nom de l'article</label>
+              <input type="text" placeholder="Veuillez saisir le nom" class="form-control">
+            </div>
+
+            <div class="form-group">
+              <label>Catégorie</label>
+              <select class="form-control">
+                <option value="">Choisir une catégorie</option>
+                <option value="Ordinateur">Ordinateur</option>
+                <option value="Imprimante">Imprimante</option>
+                <option value="Accessoire">Accessoire</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Quantité</label>
+              <input type="number" placeholder="Veuillez saisir la quantité" class="form-control">
+            </div>
+
+            <div class="form-group">
+              <label>Prix unitaire</label>
+              <input type="number" placeholder="Veuillez saisir le prix" class="form-control">
+            </div>
+
+            <div class="form-group">
+              <label>Date de fabrication</label>
+              <input type="date" class="form-control">
+            </div>
+
+            <div class="form-group">
+              <label>Date d'expiration</label>
+              <input type="date" class="form-control">
+            </div>
+
+            <div class="form-group">
+              <label>Image</label>
+              <input type="file" class="form-control">
+            </div>
+
+            <button type="submit" class="btn-valider">Valider</button>
+          </form>
+        </div>
+
+        <!-- Table Section -->
+        <div class="table-section">
+          <table>
+            <thead>
+              <tr>
+                <th>Nom article</th>
+                <th>Catégorie</th>
+                <th>Quantité</th>
+                <th>Prix unitaire</th>
+                <th>Date fabrication</th>
+                <th>Date expiration</th>
+                <th>Image</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>HP</td>
+                <td>Ordinateur</td>
+                <td>3</td>
+                <td>200000</td>
+                <td>15/09/2022</td>
+                <td>18/09/2022</td>
+                <td><img src="assets/images/hp.png" alt="HP" class="product-image"></td>
+                <td>
+                  <button class="btn-edit"><i class="fas fa-edit"></i></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
-
-      <div class="info-group">
-        <label>Nom d'utilisateur</label>
-        <input type="text" [(ngModel)]="currentUser.nomUtilisateur" name="nomUtilisateur" required>
-      </div>
-
-      <div class="info-group">
-        <label>E-mail</label>
-        <input 
-          type="email" 
-          [(ngModel)]="currentUser.email" 
-          name="email" 
-          required 
-          email
-          #emailInput="ngModel"
-          [ngClass]="{ 'invalid': emailInput.invalid && emailInput.touched }"
-        />
-        
-        <div *ngIf="emailInput.invalid && (emailInput.dirty || emailInput.touched)" class="alert">
-          <span *ngIf="emailInput.errors?.['required']">L'email est requis</span>
-          <span *ngIf="emailInput.errors?.['email']">Veuillez entrer une adresse email valide</span>
-        </div>
-      </div>
-
-      <div class="info-group">
-        <label>Rôle</label>
-        <select [(ngModel)]="currentUser.idRole" name="role" required>
-          <option value="1">Admin</option>
-          <option value="2">Agent Commercial</option>
-          <option value="3">Agent Technique</option>
-        </select>
-      </div>
-
-      <div class="info-group">
-        <label>Statut</label>
-        <select [(ngModel)]="currentUser.statut" name="statut" required>
-          <option value="Actif">Actif</option>
-          <option value="Inactif">Inactif</option>
-        </select>
-      </div>
-
-      <div class="modal-buttons">
-        <button type="submit" class="btn primary" [disabled]="(identifiantInput.invalid && !editMode) || emailInput.invalid">
-          {{ editMode ? 'Enregistrer' : 'Ajouter' }}
-        </button>
-        <button type="button" class="btn secondary" (click)="closeUserModal()">Annuler</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- Modal de confirmation de suppression -->
-<div class="modal delete-modal" *ngIf="showDeleteConfirmation">
-  <div class="modal-content">
-    <h3>Confirmation de suppression</h3>
-    <p>Êtes-vous sûr de vouloir supprimer l'utilisateur <strong>{{ userToDelete?.nomUtilisateur }}</strong> ?</p>
-    <div class="modal-buttons">
-      <button class="btn primary" (click)="deleteUserConfirmed()">OK</button>
-      <button class="btn secondary" (click)="cancelDelete()">Annuler</button>
     </div>
-  </div>
+  </main>
 </div>
