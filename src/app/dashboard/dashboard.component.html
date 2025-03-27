@@ -1,130 +1,94 @@
-<app-sidebar></app-sidebar>
-
-<main class="main-content">
-  <app-header></app-header>
-  
-  <div class="page-header">
-    <h1><i class="fas fa-tachometer-alt"></i> Tableau de Bord</h1>
-    <div class="actions">
-      <button class="btn" (click)="refreshData()"><i class="fas fa-sync"></i> Actualiser</button>
-    </div>
-  </div>
-
-  <!-- Cards de statistiques -->
-  <div class="stats-cards">
-    <div *ngFor="let card of statsCards" class="stat-card" [ngStyle]="{'--card-color': card.color}">
-      <div class="stat-icon">
-        <i class="fas" [ngClass]="card.icon"></i>
-      </div>
-      <div class="stat-content">
-        <h3 class="stat-value">{{ card.value }}</h3>
-        <p class="stat-title">{{ card.title }}</p>
-      </div>
-      <div class="stat-indicator">
-        <i class="fas fa-arrow-up"></i>
-      </div>
-    </div>
-  </div>
-
-  <!-- Graphique principal -->
-  <div class="chart-card stats-summary">
-    <div class="card-header">
-      <h3><i class="fas fa-chart-bar"></i> Bilan des mouvements de stock</h3>
-     
-      </div>
-    </div>
-    <div class="chart-container">
-      <canvas id="statsBarChart"></canvas>
-    </div>
-
-
-  <!-- Graphiques secondaires -->
-  <div class="charts-container">
-    <div class="chart-card">
-      <div class="card-header">
-        <h3><i class="fas fa-chart-pie"></i> Répartition par catégorie</h3>
-        <div class="card-actions">
-          
-        </div>
-      </div>
-      <div class="chart-container">
-        <canvas id="categoryChart"></canvas>
-      </div>
-    </div>
-
-    <div class="chart-card">
-      <div class="card-header">
-        <h3><i class="fas fa-building"></i> Répartition par constructeur</h3>
-        <div class="card-actions">
-          
-        </div>
-      </div>
-      <div class="chart-container">
-        <canvas id="constructeurChart"></canvas>
-      </div>
-    </div>
-  </div>
-  
-  <div class="charts-row">
-    <!-- Graphique d'évolution -->
-    <div class="chart-card evolution-chart">
-      <div class="card-header">
-        <h3><i class="fas fa-chart-line"></i> Évolution des stocks</h3>
-        <div class="card-controls">
-          <select [(ngModel)]="selectedPeriod" (change)="updateChartData()" class="period-select">
-            <option value="day">Jour</option>
-            <option value="week">Semaine</option>
-            <option value="month">Mois</option>
-          </select>
-        </div>
-      </div>
-      <div class="chart-container">
-        <canvas id="stockChart"></canvas >
-      </div>
-    </div>
-    
-  
-  </div>
-
-  <!-- Liste des produits récents -->
-  <div class="section-header">
-    <h2><i class="fas fa-cube"></i> Produits en stock</h2>
-    <a href="#" class="view-all">Voir tous les produits</a>
-  </div>
-  
-  <div class="products-grid">
-    <div *ngFor="let item of stockItems" class="product-card">
-      <div class="product-header">
-        <span class="product-id">ID: {{ item.id }}</span>
-        <span class="status" [ngClass]="getStatusClass(item.quantity)">
-          {{ getStatusText(item.quantity) }}
-        </span>
-      </div>
-      <div class="product-content">
-        <h3 class="product-name">{{ item.name }}</h3>
-        <div class="product-category">
-          <i class="fas" [ngClass]="getCategoryIcon(item.category)"></i>
-          {{ item.category }}
-          <span class="manufacturer-badge" [ngClass]="'manufacturer-' + item.constructeur.toLowerCase()">
-            <i class="fas" [ngClass]="getManufacturerIcon(item.constructeur)"></i>
-            {{ item.constructeur }}
-          </span>
-        </div>
-        <div class="product-details">
-          <div class="detail-item">
-            <span class="detail-label">Quantité</span>
-            <span class="detail-value">{{ item.quantity }}</span>
-          </div>
-        </div>
-      </div>
-      <div class="product-actions">
-        <button class="btn-icon" (click)="editProduct(item)" title="Modifier">
-          <i class="fas fa-edit"></i>
-        </button>
-        <button class="btn-icon" (click)="deleteProduct(item)" title="Supprimer">
-          <i class="fas fa-trash"></i>
-        </button>
-      </div>
-    </div>
-  </div>
+<app-sidebar></app-sidebar> 
+<main class="main-content">   
+  <app-header></app-header>      
+  <div class="dashboard-container">     
+    <div class="header">       
+      <h1>Tableau de Bord </h1>              
+      <div class="summary-cards">         
+        <div class="card">           
+          <div class="card-icon icon-total-articles">             
+            <i class="fas fa-box"></i>           
+          </div>           
+          <div class="card-content">             
+            <h3>Total Articles</h3>             
+            <p>{{ totalArticles }}</p>           
+          </div>         
+        </div>                  
+        <div class="card">           
+          <div class="card-icon icon-total-quantity">             
+            <i class="fas fa-cubes"></i>           
+          </div>           
+          <div class="card-content">             
+            <h3>Quantité Totale</h3>             
+            <p>{{ totalQuantity }}</p>           
+          </div>         
+        </div>                  
+        <div class="card warning">           
+          <div class="card-icon icon-low-stock">             
+            <i class="fas fa-exclamation-triangle"></i>           
+          </div>           
+          <div class="card-content">             
+            <h3>Stock Faible</h3>             
+            <p>{{ lowStockItemsCount }} articles</p>           
+          </div>         
+        </div>                  
+        <div class="card alert">           
+          <div class="card-icon icon-expiring">             
+            <i class="fas fa-bell"></i>           
+          </div>           
+          <div class="card-content">             
+            <h3>Fin de Vente Proche</h3>             
+            <p>{{ expiringItemsCount }} articles</p>           
+          </div>         
+        </div>       
+      </div>     
+    </div>      
+    <div class="charts-container">       
+      <div class="chart-box">         
+        <canvas #categoryChart height="300"></canvas>       
+      </div>              
+      <div class="chart-box">         
+        <canvas #manufacturerChart height="300"></canvas>       
+      </div>     
+    </div>      
+    <div class="table-container">       
+      <div class="table-header">         
+        <h2>Liste des Articles</h2>         
+        <div class="table-actions">           
+          <input type="text" 
+                 placeholder="Rechercher..." 
+                 class="search-input" 
+                 (input)="onSearch($event)">         
+        </div>       
+      </div>              
+      <table>         
+        <thead>           
+          <tr>             
+            <th>Article</th>             
+            <th>Constructeur</th>             
+            <th>Catégorie</th>             
+            <th>Date</th>             
+            <th>Quantité</th>             
+            <th>Fin de Vente</th>             
+            <th>Fin de Support</th>             
+                      
+          </tr>         
+        </thead>         
+        <tbody>           
+          <tr *ngFor="let item of filteredStockData">             
+            <td>{{ item.article }}</td>             
+            <td>{{ item.constructeur }}</td>             
+            <td>{{ item.categorie }}</td>             
+            <td>{{ item.date }}</td>             
+            <td [class.low-stock]="item.quantite < 20">{{ item.quantite }}</td>             
+            <td [class.expiring]="getExpiringItems().includes(item)">{{ item.endOfSale }}</td>             
+            <td>{{ item.endOfSupport }}</td>             
+            <td>               
+                        
+            </td>           
+          </tr>         
+        </tbody>       
+      </table>     
+    </div>   
+  </div> 
 </main>
