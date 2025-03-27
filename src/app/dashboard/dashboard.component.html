@@ -1,94 +1,110 @@
-<app-sidebar></app-sidebar> 
-<main class="main-content">   
-  <app-header></app-header>      
-  <div class="dashboard-container">     
-    <div class="header">       
-      <h1>Tableau de Bord </h1>              
-      <div class="summary-cards">         
-        <div class="card">           
-          <div class="card-icon icon-total-articles">             
-            <i class="fas fa-box"></i>           
-          </div>           
-          <div class="card-content">             
-            <h3>Total Articles</h3>             
-            <p>{{ totalArticles }}</p>           
-          </div>         
-        </div>                  
-        <div class="card">           
-          <div class="card-icon icon-total-quantity">             
-            <i class="fas fa-cubes"></i>           
-          </div>           
-          <div class="card-content">             
-            <h3>Quantité Totale</h3>             
-            <p>{{ totalQuantity }}</p>           
-          </div>         
-        </div>                  
-        <div class="card warning">           
-          <div class="card-icon icon-low-stock">             
-            <i class="fas fa-exclamation-triangle"></i>           
-          </div>           
-          <div class="card-content">             
-            <h3>Stock Faible</h3>             
-            <p>{{ lowStockItemsCount }} articles</p>           
-          </div>         
-        </div>                  
-        <div class="card alert">           
-          <div class="card-icon icon-expiring">             
-            <i class="fas fa-bell"></i>           
-          </div>           
-          <div class="card-content">             
-            <h3>Fin de Vente Proche</h3>             
-            <p>{{ expiringItemsCount }} articles</p>           
-          </div>         
-        </div>       
-      </div>     
-    </div>      
-    <div class="charts-container">       
-      <div class="chart-box">         
-        <canvas #categoryChart height="300"></canvas>       
-      </div>              
-      <div class="chart-box">         
-        <canvas #manufacturerChart height="300"></canvas>       
-      </div>     
-    </div>      
-    <div class="table-container">       
-      <div class="table-header">         
-        <h2>Liste des Articles</h2>         
-        <div class="table-actions">           
-          <input type="text" 
-                 placeholder="Rechercher..." 
-                 class="search-input" 
-                 (input)="onSearch($event)">         
-        </div>       
-      </div>              
-      <table>         
-        <thead>           
-          <tr>             
-            <th>Article</th>             
-            <th>Constructeur</th>             
-            <th>Catégorie</th>             
-            <th>Date</th>             
-            <th>Quantité</th>             
-            <th>Fin de Vente</th>             
-            <th>Fin de Support</th>             
-                      
-          </tr>         
-        </thead>         
-        <tbody>           
-          <tr *ngFor="let item of filteredStockData">             
-            <td>{{ item.article }}</td>             
-            <td>{{ item.constructeur }}</td>             
-            <td>{{ item.categorie }}</td>             
-            <td>{{ item.date }}</td>             
-            <td [class.low-stock]="item.quantite < 20">{{ item.quantite }}</td>             
-            <td [class.expiring]="getExpiringItems().includes(item)">{{ item.endOfSale }}</td>             
-            <td>{{ item.endOfSupport }}</td>             
-            <td>               
-                        
-            </td>           
-          </tr>         
-        </tbody>       
-      </table>     
-    </div>   
-  </div> 
+<app-sidebar></app-sidebar>
+<main class="main-content">
+    <app-header></app-header>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1 class="page-title">Tableau de Bord Inventaire</h1>
+            <div class="search-container">
+                <input 
+                    type="text" 
+                    placeholder="Rechercher des articles..." 
+                    (input)="onSearch($event)"
+                    class="search-input"
+                >
+            </div>
+        </div>
+
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="card-icon icon-total-articles">
+                    <i class="fas fa-box"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Total Articles</h3>
+                    <p class="card-value">{{ totalArticles }}</p>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="card-icon icon-total-quantity">
+                    <i class="fas fa-cubes"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Quantité Totale</h3>
+                    <p class="card-value">{{ totalQuantity }}</p>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="card-icon icon-low-stock">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Stock Faible</h3>
+                    <p class="card-value">{{ lowStockItemsCount }} articles</p>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="card-icon icon-expiring">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Fin de Vente Proche</h3>
+                    <p class="card-value">{{ expiringItemsCount }} articles</p>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="card-icon icon-total-entries">
+                    <i class="fas fa-sign-in-alt"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Total Entrées</h3>
+                    <p class="card-value">{{ totalEntries }}</p>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="card-icon icon-total-exits">
+                    <i class="fas fa-sign-out-alt"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Total Sorties</h3>
+                    <p class="card-value">{{ totalExits }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-section">
+            <div class="chart-row">
+                <div class="chart-container">
+                    <h2 class="chart-title">Évolution du Stock Total</h2>
+                    <canvas #stockEvolutionChart></canvas>
+                </div>
+                <div class="chart-container">
+                    <h2 class="chart-title">Distribution des Stocks</h2>
+                    <canvas #categoryChart></canvas>
+                </div>
+            </div>
+
+            <div class="chart-row">
+                <div class="chart-container">
+                    <h2 class="chart-title">Stock par Constructeur</h2>
+                    <canvas #manufacturerChart></canvas>
+                </div>
+            </div>
+
+            <div class="chart-row">
+                <div class="chart-container">
+                    <h2 class="chart-title">Entrées de Stock</h2>
+                    <canvas #entriesChart></canvas>
+                </div>
+                <div class="chart-container">
+                    <h2 class="chart-title">Sorties de Stock</h2>
+                    <canvas #exitsChart></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
 </main>
