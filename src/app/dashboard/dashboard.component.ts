@@ -6,10 +6,27 @@ Chart.register(...registerables);
 
 import { SidebarComponent } from "../components/sidebar/sidebar.component";
 import { HeaderComponent } from "../components/header/header.component";
-import { DashboardService } from '../Service/dashboard.service';
+import { DashboardService, StockItem } from '../Service/dashboard.service';
+
+
+
+interface StockMovement {
+  month: string;
+  totalQuantity: number;
+}
+
+interface SummaryCard {
+  title: string;
+  value: number | string;
+  icon: string;
+  valueClass?: string;
+  trendClass?: string;
+  trendIcon?: string;
+  trendPercentage?: number;
+}
 
 @Component({
-  selector: 'app-dashboard',
+  selector: 'app-enhanced-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
   standalone: true,
@@ -19,307 +36,280 @@ export class DashboardComponent implements OnInit {
   @ViewChild('categoryChart') categoryChartRef!: ElementRef;
   @ViewChild('manufacturerChart') manufacturerChartRef!: ElementRef;
   @ViewChild('stockEvolutionChart') stockEvolutionChartRef!: ElementRef;
-  @ViewChild('entriesChart') entriesChartRef!: ElementRef;
-  @ViewChild('exitsChart') exitsChartRef!: ElementRef;
 
-  // Metrics
-  totalArticles: number = 0;
-  totalQuantity: number = 0;
-  lowStockItemsCount: number = 0;
-  expiringItemsCount: number = 0;
-  totalEntries: number = 0;
-  totalExits: number = 0;
-
-  // Charts
+  stockData: StockItem[] = [];
+  summaryCards: SummaryCard[] = [];
+  filteredStockData: StockItem[] = [];
+  
   categoryChart: Chart | null = null;
   manufacturerChart: Chart | null = null;
   stockEvolutionChart: Chart | null = null;
-  entriesChart: Chart | null = null;
-  exitsChart: Chart | null = null;
 
-  constructor(private dashboardService: DashboardService) {}
+  isDarkMode = false;
+
+  constructor(private dashboardService: DashboardService) {
+    this.filteredStockData = [...this.stockData];
+  }
 
   ngOnInit() {
     this.loadDashboardMetrics();
     this.loadChartData();
+    this.loadStockItems();
   }
+  
 
   ngAfterViewInit() {
-    // Charts will be created after data is loaded
+    // Chart creation is now handled in loadChartData()
+  }
+  loadStockItems() {
+    this.dashboardService.getStockItems().subscribe({
+      next: (items) => {
+        console.log('Stock Items Fetched:', items); // Debug log
+        this.stockData = items;
+        this.filteredStockData = [...items];
+      },
+      error: (error) => {
+        console.error('Error fetching stock items:', error); // Error log
+      },
+      complete: () => {
+        console.log('Stock items fetch completed'); // Completion log
+      }
+    });
   }
 
   loadDashboardMetrics() {
     this.dashboardService.getDashboardMetrics().subscribe(metrics => {
-      this.totalArticles = metrics.totalArticles;
-      this.totalQuantity = metrics.totalQuantity;
-      this.lowStockItemsCount = metrics.lowStockItemsCount;
-      this.expiringItemsCount = metrics.expiringItemsCount;
-      this.totalEntries = metrics.totalEntries;
-      this.totalExits = metrics.totalExits;
+      this.summaryCards = [
+        {
+          title: 'Total Articles',
+          value: metrics.totalArticles,
+          icon: 'fas fa-box',
+          trendPercentage: this.calculateTrend('articles'),
+          trendClass: this.calculateTrend('articles') >= 0 ? 'text-green-500' : 'text-red-500',
+          trendIcon: this.calculateTrend('articles') >= 0 ? 'fa-arrow-up' : 'fa-arrow-down'
+        },
+        {
+          title: 'Quantité Totale',
+          value: metrics.totalQuantity,
+          icon: 'fas fa-cubes',
+          trendPercentage: this.calculateTrend('quantity'),
+          trendClass: this.calculateTrend('quantity') >= 0 ? 'text-blue-500' : 'text-red-500',
+          trendIcon: this.calculateTrend('quantity') >= 0 ? 'fa-arrow-up' : 'fa-arrow-down'
+        },
+        {
+          title: 'Stock Faible',
+          value: `${metrics.lowStockItemsCount} articles`,
+          icon: 'fas fa-exclamation-triangle',
+          valueClass: 'text-orange-500',
+          trendPercentage: this.calculateTrend('lowStock'),
+          trendClass: 'text-orange-500',
+          trendIcon: 'fa-arrow-up'
+        },
+        {
+          title: 'Fin de Vente Proche',
+          value: `${metrics.expiringItemsCount} articles`,
+          icon: 'fas fa-bell',
+          valueClass: 'text-red-500',
+          trendPercentage: this.calculateTrend('expiringItems'),
+          trendClass: 'text-red-500',
+          trendIcon: 'fa-arrow-up'
+        }
+      ];
     });
   }
 
   loadChartData() {
-    // Load Category Distribution
+    // Category Distribution Chart
     this.dashboardService.getCategoryDistribution().subscribe(categoryData => {
-      const chartData = {
-        labels: Object.keys(categoryData),
-        data: Object.values(categoryData)
-      };
-      this.createCategoryChart(chartData);
+      this.createCategoryChart(
+        Object.keys(categoryData),
+        Object.values(categoryData)
+      );
     });
 
-    // Load Manufacturer Distribution
+    // Manufacturer Stock Chart
     this.dashboardService.getManufacturerDistribution().subscribe(manufacturerData => {
-      const chartData = {
-        labels: Object.keys(manufacturerData),
-        data: Object.values(manufacturerData)
-      };
-      this.createManufacturerChart(chartData);
+      this.createManufacturerChart(
+        Object.keys(manufacturerData),
+        Object.values(manufacturerData)
+      );
     });
 
-    // Load Stock Evolution
+    // Stock Evolution Chart
     this.dashboardService.getStockEvolution().subscribe(stockEvolutionData => {
-      this.createStockEvolutionChart(stockEvolutionData);
-    });
-
-    // Load Entries and Exits Evolution
-    this.dashboardService.getEntriesAndExitsEvolution().subscribe(entriesExitsData => {
-      this.createEntriesAndExitsCharts(entriesExitsData);
+      this.createStockEvolutionChart(
+        stockEvolutionData.map(item => item.month),
+        stockEvolutionData.map(item => item.totalQuantity)
+      );
     });
   }
 
-  createCategoryChart(categoryData: {labels: string[], data: number[]}) {
-    if (this.categoryChart) this.categoryChart.destroy();
-
-    const categoryCtx = this.categoryChartRef.nativeElement.getContext('2d');
-    this.categoryChart = new Chart(categoryCtx, {
-      type: 'doughnut',
-      data: {
-        labels: categoryData.labels,
-        datasets: [{
-          data: categoryData.data,
-          backgroundColor: [
-            'rgba(54, 162, 235, 0.8)',
-            'rgba(255, 99, 132, 0.8)',
-            'rgba(75, 192, 192, 0.8)',
-            'rgba(255, 206, 86, 0.8)',
-            'rgba(153, 102, 255, 0.8)',
-            'rgba(255, 159, 64, 0.8)',
-            'blue'
-          ],
-          hoverOffset: 10
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          title: {
-            display: true,
-            text: 'Distribution des Stocks par Catégorie',
-            font: { size: 16, weight: 'bold' }
-          },
-          legend: {
-            position: 'right',
-            labels: {
-              font: { size: 12 },
-              usePointStyle: true,
-            }
-          }
-        }
-      }
-    });
+  toggleTheme() {
+    this.isDarkMode = !this.isDarkMode;
+    document.body.classList.toggle('dark-theme');
   }
 
-  createManufacturerChart(manufacturerData: {labels: string[], data: number[]}) {
-    if (this.manufacturerChart) this.manufacturerChart.destroy();
-
-    const manufacturerCtx = this.manufacturerChartRef.nativeElement.getContext('2d');
-    this.manufacturerChart = new Chart(manufacturerCtx, {
-      type: 'bar',
-      data: {
-        labels: manufacturerData.labels,
-        datasets: [{
-          label: 'Quantité par Constructeur',
-          data: manufacturerData.data,
-          backgroundColor: [
-            'rgba(54, 162, 235, 0.7)',
-            'rgba(255, 99, 132, 0.7)',
-            'rgba(75, 192, 192, 0.7)'
-          ],
-          borderColor: [
-            'rgba(54, 162, 235, 1)',
-            'rgba(255, 99, 132, 1)',
-            'rgba(75, 192, 192, 1)'
-          ],
-          borderWidth: 1,
-          borderRadius: 10
-        }]
-      },
-      options: {
-        indexAxis: 'y',
-        responsive: true,
-        plugins: {
-          title: {
-            display: true,
-            text: 'Quantité de Stock par Constructeur',
-            font: { size: 16, weight: 'bold' }
-          },
-          legend: { display: false }
-        },
-        scales: {
-          x: {
-            beginAtZero: true,
-            title: {
-              display: true,
-              text: 'Quantité'
-            }
-          }
-        }
-      }
-    });
-  }
-
-  
-createStockEvolutionChart(stockEvolutionData: any[]) {
-  
-  if (this.stockEvolutionChart) this.stockEvolutionChart.destroy();
-
-  // Formatter les mois
-  const formattedData = stockEvolutionData.map(item => ({
-    month: this.formatMonthLabel(item.month),
-    totalQuantity: item.totalQuantity
-  }));
-
-  const stockEvolutionCtx = this.stockEvolutionChartRef.nativeElement.getContext('2d');
-  this.stockEvolutionChart = new Chart(stockEvolutionCtx, {
-    type: 'line',
-    data: {
-      labels: formattedData.map(item => item.month),
-      datasets: [{
-        label: 'Évolution du Stock Total',
-        data: formattedData.map(item => item.totalQuantity),
-        borderColor: 'rgba(75, 192, 192, 1)',
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-        tension: 0.4,
-        fill: true
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        title: {
-          display: true,
-          text: 'Évolution du Stock Total',
-          font: { size: 16, weight: 'bold' }
-        },
-        legend: { display: true }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: 'Quantité Totale'
-          }
-        },
-        x: {
-          title: {
-            display: true,
-            text: 'Période'
-          }
-        }
-      }
+  calculateTrend(type: string): number {
+    // Implement trend calculation logic
+    switch(type) {
+      case 'articles': return 5.2;
+      case 'quantity': return 3.7;
+      case 'lowStock': return 2.1;
+      case 'expiringItems': return 1.5;
+      default: return 0;
     }
-  });
-}
+  }
 
-// Méthode pour formater les étiquettes de mois
-formatMonthLabel(monthCode: string): string {
-  const [year, month] = monthCode.split('-');
-  const monthNames = [
-    'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 
-    'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
-  ];
-  
-  // Converti le mois en nombre (soustrait 1 car les tableaux commencent à 0)
-  const monthIndex = parseInt(month) - 1;
-  
-  return `${monthNames[monthIndex]} ${year}`;
-}
+  onSearch(event: any) {
+    const searchTerm = event.target.value.toLowerCase();
+    this.filteredStockData = this.stockData.filter(item => 
+      item.article.toLowerCase().includes(searchTerm) ||
+      item.constructeur.toLowerCase().includes(searchTerm) ||
+      item.categorie.toLowerCase().includes(searchTerm)
+    );
+  }
 
-  createEntriesAndExitsCharts(entriesExitsData: any[]) {
-    if (this.entriesChart) this.entriesChart.destroy();
-    if (this.exitsChart) this.exitsChart.destroy();
-
-    // Entries Bar Chart
-    const entriesCtx = this.entriesChartRef.nativeElement.getContext('2d');
-    this.entriesChart = new Chart(entriesCtx, {
-      type: 'bar',
-      data: {
-        labels: entriesExitsData.map(item => item.month),
-        datasets: [{
-          label: 'Entrées de Stock',
-          data: entriesExitsData.map(item => item.totalEntries),
-          backgroundColor: 'rgba(75, 192, 192, 0.6)',
-          borderColor: 'rgba(75, 192, 192, 1)',
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          title: {
-            display: true,
-            text: 'Évolution des Entrées de Stock',
-            font: { size: 16, weight: 'bold' }
-          }
+  // Chart Creation Methods
+  createCategoryChart(labels: string[], quantities: number[]) {
+    if (this.categoryChartRef && this.categoryChartRef.nativeElement) {
+      this.categoryChart = new Chart(this.categoryChartRef.nativeElement, {
+        type: 'pie',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: quantities,
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.7)',
+              'rgba(54, 162, 235, 0.7)',
+              'rgba(255, 206, 86, 0.7)',
+              'rgba(75, 192, 192, 0.7)',
+              'rgba(153, 102, 255, 0.7)'
+            ],
+            borderColor: [
+              'rgba(255, 99, 132, 1)',
+              'rgba(54, 162, 235, 1)',
+              'rgba(255, 206, 86, 1)',
+              'rgba(75, 192, 192, 1)',
+              'rgba(153, 102, 255, 1)'
+            ],
+            borderWidth: 1
+          }]
         },
-        scales: {
-          y: {
-            beginAtZero: true,
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
             title: {
               display: true,
-              text: 'Quantité'
+              text: 'Distribution des Catégories'
             }
           }
         }
-      }
-    });
+      });
+    }
+  }
 
-    // Exits Bar Chart
-    const exitsCtx = this.exitsChartRef.nativeElement.getContext('2d');
-    this.exitsChart = new Chart(exitsCtx, {
-      type: 'bar',
-      data: {
-        labels: entriesExitsData.map(item => item.month),
-        datasets: [{
-          label: 'Sorties de Stock',
-          data: entriesExitsData.map(item => item.totalExits),
-          backgroundColor: 'rgba(255, 99, 132, 0.6)',
-          borderColor: 'rgba(255, 99, 132, 1)',
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          title: {
-            display: true,
-            text: 'Évolution des Sorties de Stock',
-            font: { size: 16, weight: 'bold' }
-          }
+  createManufacturerChart(labels: string[], quantities: number[]) {
+    if (this.manufacturerChartRef && this.manufacturerChartRef.nativeElement) {
+      this.manufacturerChart = new Chart(this.manufacturerChartRef.nativeElement, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Quantité en Stock',
+            data: quantities,
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.6)',
+              'rgba(54, 162, 235, 0.6)',
+              'rgba(255, 206, 86, 0.6)'
+            ],
+            borderColor: [
+              'rgba(255, 99, 132, 1)',
+              'rgba(54, 162, 235, 1)',
+              'rgba(255, 206, 86, 1)'
+            ],
+            borderWidth: 1
+          }]
         },
-        scales: {
-          y: {
-            beginAtZero: true,
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Quantité'
+              }
+            }
+          },
+          plugins: {
             title: {
               display: true,
-              text: 'Quantité'
+              text: 'Stock par Constructeur'
             }
           }
         }
-      }
+      });
+    }
+  }
+
+  createStockEvolutionChart(months: string[], quantities: number[]) {
+    if (this.stockEvolutionChartRef && this.stockEvolutionChartRef.nativeElement) {
+      this.stockEvolutionChart = new Chart(this.stockEvolutionChartRef.nativeElement, {
+        type: 'line',
+        data: {
+          labels: months,
+          datasets: [{
+            label: 'Quantité Totale',
+            data: quantities,
+            fill: false,
+            borderColor: 'rgb(75, 192, 192)',
+            tension: 0.1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Évolution du Stock Total'
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Quantité'
+              }
+            }
+          }
+        }
+      });
+    }
+  }
+
+  // Helper methods for data transformations
+  getTotalQuantity(): number {
+    return this.stockData.reduce((total, item) => total + item.quantite, 0);
+  }
+
+  getLowStockItems(): StockItem[] {
+    return this.stockData.filter(item => item.quantite < 20);
+  }
+
+  getExpiringItems(): StockItem[] {
+    const today = new Date();
+    const threemonths = new Date();
+    threemonths.setMonth(threemonths.getMonth() + 3);
+    
+    return this.stockData.filter(item => {
+      if (item.endOfSale === 'Not announced') return false;
+      const [day, month, year] = item.endOfSale.split('-');
+      const endOfSale = new Date(`${month} ${day} ${year}`);
+      return endOfSale <= threemonths && endOfSale >= today;
     });
   }
 }
