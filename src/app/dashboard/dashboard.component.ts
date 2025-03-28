@@ -1,33 +1,19 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
 import { Chart, registerables } from 'chart.js';
 Chart.register(...registerables);
 
 import { SidebarComponent } from "../components/sidebar/sidebar.component";
 import { HeaderComponent } from "../components/header/header.component";
-
-interface StockItem {
-  article: string;
-  constructeur: string;
-  categorie: string;
-  date: string;
-  quantite: number;
-  endOfSale: string;
-  endOfSupport: string;
-  movementType: 'entry' | 'exit';
-}
-
-interface StockMovement {
-  month: string;
-  totalQuantity: number;
-}
+import { DashboardService } from '../Service/dashboard.service';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
   standalone: true,
-  imports: [CommonModule, SidebarComponent, HeaderComponent]
+  imports: [CommonModule, HttpClientModule, SidebarComponent, HeaderComponent]
 })
 export class DashboardComponent implements OnInit {
   @ViewChild('categoryChart') categoryChartRef!: ElementRef;
@@ -36,23 +22,7 @@ export class DashboardComponent implements OnInit {
   @ViewChild('entriesChart') entriesChartRef!: ElementRef;
   @ViewChild('exitsChart') exitsChartRef!: ElementRef;
 
-  stockData: StockItem[] = [
-    { article: 'NIM-4G-LTE-GA', constructeur: 'CISCO', categorie: 'Carte NIM 4G', date: '1/1/2022', quantite: 100, endOfSale: '31-Oct-23', endOfSupport: '31-Oct-28', movementType: 'entry' },
-    { article: 'NIM-1GE-CU-SFP', constructeur: 'CISCO', categorie: 'Carte NIM FO', date: '1/1/2022', quantite: 90, endOfSale: '31-Oct-23', endOfSupport: '31-Oct-28', movementType: 'entry' },
-    { article: 'Carte NIM FXS 4ports', constructeur: 'CISCO', categorie: 'Carte NIM FXS', date: '1/1/2022', quantite: 70, endOfSale: '31-Oct-23', endOfSupport: '31-Oct-28', movementType: 'entry' },
-    { article: 'NIM-VDSL2/ADSL2/2+', constructeur: 'CISCO', categorie: 'Carte NIM VDSL', date: '1/1/2022', quantite: 50, endOfSale: '31-Oct-23', endOfSupport: '31-Oct-28', movementType: 'entry' },
-    { article: 'Jarretière optique FC/LC 2m duplex', constructeur: 'CISCO', categorie: 'Jarretière optique', date: '1/5/2022', quantite: 50, endOfSale: 'Not announced', endOfSupport: 'Not announced', movementType: 'exit' },
-    { article: 'Jarretière optique FC/LC 2m SM', constructeur: 'CISCO', categorie: 'Jarretière optique', date: '1/5/2022', quantite: 75, endOfSale: 'Not announced', endOfSupport: 'Not announced', movementType: 'exit' },
-    { article: 'Jarretière optique LC/LC 2m duplex', constructeur: 'CISCO', categorie: 'Jarretière optique', date: '1/5/2022', quantite: 40, endOfSale: 'Not announced', endOfSupport: 'Not announced', movementType: 'exit' },
-    { article: 'Jarretière optique LCPC/LCPC 2m SM', constructeur: 'CISCO', categorie: 'Jarretière optique', date: '1/5/2022', quantite: 60, endOfSale: 'Not announced', endOfSupport: 'Not announced', movementType: 'exit' },
-    { article: 'GLC-BX-D', constructeur: 'CISCO', categorie: 'Module SFP', date: '1/10/2022', quantite: 5, endOfSale: '31-Jan-22', endOfSupport: '31-Jan-27', movementType: 'entry' },
-    { article: 'GLC-BX-U', constructeur: 'CISCO', categorie: 'Module SFP', date: '1/10/2022', quantite: 0, endOfSale: '31-Jan-22', endOfSupport: '31-Jan-27', movementType: 'exit' },
-    { article: 'C1117-4P', constructeur: 'CISCO', categorie: 'Routeur', date: '1/15/2022', quantite: 180, endOfSale: '31-Oct-27', endOfSupport: '31-Oct-32', movementType: 'entry' },
-    { article: 'AR651', constructeur: 'Huawei', categorie: 'Routeur', date: '1/26/2022', quantite: 100, endOfSale: '31-Dec-23', endOfSupport: '31-Dec-28', movementType: 'entry' },
-    { article: 'FortiGate 80F', constructeur: 'Fortinet', categorie: 'Routeur', date: '1/30/2022', quantite: 200, endOfSale: 'Not announced', endOfSupport: 'Not announced', movementType: 'entry' }
-  ];
-
-  filteredStockData: StockItem[] = [];
+  // Metrics
   totalArticles: number = 0;
   totalQuantity: number = 0;
   lowStockItemsCount: number = 0;
@@ -60,54 +30,68 @@ export class DashboardComponent implements OnInit {
   totalEntries: number = 0;
   totalExits: number = 0;
 
+  // Charts
   categoryChart: Chart | null = null;
   manufacturerChart: Chart | null = null;
   stockEvolutionChart: Chart | null = null;
   entriesChart: Chart | null = null;
   exitsChart: Chart | null = null;
 
-  constructor() {
-    this.filteredStockData = [...this.stockData];
-  }
+  constructor(private dashboardService: DashboardService) {}
 
   ngOnInit() {
-    this.calculateDashboardMetrics();
+    this.loadDashboardMetrics();
+    this.loadChartData();
   }
 
   ngAfterViewInit() {
-    this.createCharts();
-    this.createEntriesAndExitsCharts();
+    // Charts will be created after data is loaded
   }
 
-  calculateDashboardMetrics() {
-    this.totalArticles = this.stockData.length;
-    this.totalQuantity = this.getTotalQuantity();
-    this.lowStockItemsCount = this.getLowStockItems().length;
-    this.expiringItemsCount = this.getExpiringItems().length;
-    this.totalEntries = this.getTotalMovementByType('entry');
-    this.totalExits = this.getTotalMovementByType('exit');
+  loadDashboardMetrics() {
+    this.dashboardService.getDashboardMetrics().subscribe(metrics => {
+      this.totalArticles = metrics.totalArticles;
+      this.totalQuantity = metrics.totalQuantity;
+      this.lowStockItemsCount = metrics.lowStockItemsCount;
+      this.expiringItemsCount = metrics.expiringItemsCount;
+      this.totalEntries = metrics.totalEntries;
+      this.totalExits = metrics.totalExits;
+    });
   }
 
-  getTotalQuantity(): number {
-    return this.stockData.reduce((total, item) => total + item.quantite, 0);
+  loadChartData() {
+    // Load Category Distribution
+    this.dashboardService.getCategoryDistribution().subscribe(categoryData => {
+      const chartData = {
+        labels: Object.keys(categoryData),
+        data: Object.values(categoryData)
+      };
+      this.createCategoryChart(chartData);
+    });
+
+    // Load Manufacturer Distribution
+    this.dashboardService.getManufacturerDistribution().subscribe(manufacturerData => {
+      const chartData = {
+        labels: Object.keys(manufacturerData),
+        data: Object.values(manufacturerData)
+      };
+      this.createManufacturerChart(chartData);
+    });
+
+    // Load Stock Evolution
+    this.dashboardService.getStockEvolution().subscribe(stockEvolutionData => {
+      this.createStockEvolutionChart(stockEvolutionData);
+    });
+
+    // Load Entries and Exits Evolution
+    this.dashboardService.getEntriesAndExitsEvolution().subscribe(entriesExitsData => {
+      this.createEntriesAndExitsCharts(entriesExitsData);
+    });
   }
 
-  getTotalMovementByType(movementType: 'entry' | 'exit'): number {
-    return this.stockData
-      .filter(item => item.movementType === movementType)
-      .reduce((total, item) => total + item.quantite, 0);
-  }
-
-  createCharts() {
-    const categoryData = this.getCategoryData();
-    const manufacturerData = this.getManufacturerData();
-    const stockEvolutionData = this.getStockEvolutionData();
-
+  createCategoryChart(categoryData: {labels: string[], data: number[]}) {
     if (this.categoryChart) this.categoryChart.destroy();
-    if (this.manufacturerChart) this.manufacturerChart.destroy();
-    if (this.stockEvolutionChart) this.stockEvolutionChart.destroy();
 
-    // Category Doughnut Chart
     const categoryCtx = this.categoryChartRef.nativeElement.getContext('2d');
     this.categoryChart = new Chart(categoryCtx, {
       type: 'doughnut',
@@ -145,8 +129,11 @@ export class DashboardComponent implements OnInit {
         }
       }
     });
+  }
 
-    // Manufacturer Horizontal Bar Chart
+  createManufacturerChart(manufacturerData: {labels: string[], data: number[]}) {
+    if (this.manufacturerChart) this.manufacturerChart.destroy();
+
     const manufacturerCtx = this.manufacturerChartRef.nativeElement.getContext('2d');
     this.manufacturerChart = new Chart(manufacturerCtx, {
       type: 'bar',
@@ -191,55 +178,77 @@ export class DashboardComponent implements OnInit {
         }
       }
     });
+  }
 
-    // Stock Evolution Line Chart
-    const stockEvolutionCtx = this.stockEvolutionChartRef.nativeElement.getContext('2d');
-    this.stockEvolutionChart = new Chart(stockEvolutionCtx, {
-      type: 'line',
-      data: {
-        labels: stockEvolutionData.map(item => item.month),
-        datasets: [{
-          label: 'Évolution du Stock Total',
-          data: stockEvolutionData.map(item => item.totalQuantity),
-          borderColor: 'rgba(75, 192, 192, 1)',
-          backgroundColor: 'rgba(75, 192, 192, 0.2)',
-          tension: 0.4,
-          fill: true
-        }]
+  
+createStockEvolutionChart(stockEvolutionData: any[]) {
+  
+  if (this.stockEvolutionChart) this.stockEvolutionChart.destroy();
+
+  // Formatter les mois
+  const formattedData = stockEvolutionData.map(item => ({
+    month: this.formatMonthLabel(item.month),
+    totalQuantity: item.totalQuantity
+  }));
+
+  const stockEvolutionCtx = this.stockEvolutionChartRef.nativeElement.getContext('2d');
+  this.stockEvolutionChart = new Chart(stockEvolutionCtx, {
+    type: 'line',
+    data: {
+      labels: formattedData.map(item => item.month),
+      datasets: [{
+        label: 'Évolution du Stock Total',
+        data: formattedData.map(item => item.totalQuantity),
+        borderColor: 'rgba(75, 192, 192, 1)',
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        tension: 0.4,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Évolution du Stock Total',
+          font: { size: 16, weight: 'bold' }
+        },
+        legend: { display: true }
       },
-      options: {
-        responsive: true,
-        plugins: {
+      scales: {
+        y: {
+          beginAtZero: true,
           title: {
             display: true,
-            text: 'Évolution du Stock Total',
-            font: { size: 16, weight: 'bold' }
-          },
-          legend: { display: true }
+            text: 'Quantité Totale'
+          }
         },
-        scales: {
-          y: {
-            beginAtZero: true,
-            title: {
-              display: true,
-              text: 'Quantité Totale'
-            }
-          },
-          x: {
-            title: {
-              display: true,
-              text: 'Mois'
-            }
+        x: {
+          title: {
+            display: true,
+            text: 'Période'
           }
         }
       }
-    });
-  }
+    }
+  });
+}
 
-  createEntriesAndExitsCharts() {
-    const entriesData = this.getMovementData('entry');
-    const exitsData = this.getMovementData('exit');
+// Méthode pour formater les étiquettes de mois
+formatMonthLabel(monthCode: string): string {
+  const [year, month] = monthCode.split('-');
+  const monthNames = [
+    'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 
+    'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+  ];
+  
+  // Converti le mois en nombre (soustrait 1 car les tableaux commencent à 0)
+  const monthIndex = parseInt(month) - 1;
+  
+  return `${monthNames[monthIndex]} ${year}`;
+}
 
+  createEntriesAndExitsCharts(entriesExitsData: any[]) {
     if (this.entriesChart) this.entriesChart.destroy();
     if (this.exitsChart) this.exitsChart.destroy();
 
@@ -248,10 +257,10 @@ export class DashboardComponent implements OnInit {
     this.entriesChart = new Chart(entriesCtx, {
       type: 'bar',
       data: {
-        labels: entriesData.map(item => item.month),
+        labels: entriesExitsData.map(item => item.month),
         datasets: [{
           label: 'Entrées de Stock',
-          data: entriesData.map(item => item.totalQuantity),
+          data: entriesExitsData.map(item => item.totalEntries),
           backgroundColor: 'rgba(75, 192, 192, 0.6)',
           borderColor: 'rgba(75, 192, 192, 1)',
           borderWidth: 1
@@ -283,10 +292,10 @@ export class DashboardComponent implements OnInit {
     this.exitsChart = new Chart(exitsCtx, {
       type: 'bar',
       data: {
-        labels: exitsData.map(item => item.month),
+        labels: entriesExitsData.map(item => item.month),
         datasets: [{
           label: 'Sorties de Stock',
-          data: exitsData.map(item => item.totalQuantity),
+          data: entriesExitsData.map(item => item.totalExits),
           backgroundColor: 'rgba(255, 99, 132, 0.6)',
           borderColor: 'rgba(255, 99, 132, 1)',
           borderWidth: 1
@@ -312,99 +321,5 @@ export class DashboardComponent implements OnInit {
         }
       }
     });
-  }
-
-  getCategoryData() {
-    const categories: { [key: string]: number } = {};
-    this.stockData.forEach(item => {
-      categories[item.categorie] = (categories[item.categorie] || 0) + item.quantite;
-    });
-    return {
-      labels: Object.keys(categories),
-      data: Object.values(categories)
-    };
-  }
-
-  getManufacturerData() {
-    const manufacturers: { [key: string]: number } = {};
-    this.stockData.forEach(item => {
-      manufacturers[item.constructeur] = (manufacturers[item.constructeur] || 0) + item.quantite;
-    });
-    return {
-      labels: Object.keys(manufacturers),
-      data: Object.values(manufacturers)
-    };
-  }
-
-  getStockEvolutionData(): StockMovement[] {
-    const stockEvolution: { [key: string]: number } = {};
-
-    this.stockData.forEach(item => {
-      const date = new Date(item.date);
-      const monthKey = `${date.getFullYear()}-${date.getMonth() + 1}`;
-      
-      if (!stockEvolution[monthKey]) {
-        stockEvolution[monthKey] = 0;
-      }
-      stockEvolution[monthKey] += item.quantite;
-    });
-
-    return Object.entries(stockEvolution)
-      .map(([month, totalQuantity]) => ({ month, totalQuantity }))
-      .sort((a, b) => {
-        const [aYear, aMonth] = a.month.split('-').map(Number);
-        const [bYear, bMonth] = b.month.split('-').map(Number);
-        return aYear !== bYear ? aYear - bYear : aMonth - bMonth;
-      });
-  }
-
-  getMovementData(movementType: 'entry' | 'exit'): StockMovement[] {
-    const stockMovement: { [key: string]: number } = {};
-
-    const filteredData = this.stockData.filter(item => item.movementType === movementType);
-
-    filteredData.forEach(item => {
-      const date = new Date(item.date);
-      const monthKey = `${date.getFullYear()}-${date.getMonth() + 1}`;
-      
-      if (!stockMovement[monthKey]) {
-        stockMovement[monthKey] = 0;
-      }
-      stockMovement[monthKey] += item.quantite;
-    });
-
-    return Object.entries(stockMovement)
-      .map(([month, totalQuantity]) => ({ month, totalQuantity }))
-      .sort((a, b) => {
-        const [aYear, aMonth] = a.month.split('-').map(Number);
-        const [bYear, bMonth] = b.month.split('-').map(Number);
-        return aYear !== bYear ? aYear - bYear : aMonth - bMonth;
-      });
-  }
-
-  getExpiringItems(): StockItem[] {
-    const today = new Date();
-    const threemonths = new Date();
-    threemonths.setMonth(threemonths.getMonth() + 3);
-    
-    return this.stockData.filter(item => {
-      if (item.endOfSale === 'Not announced') return false;
-      const [day, month, year] = item.endOfSale.split('-');
-      const endOfSale = new Date(`${month} ${day} ${year}`);
-      return endOfSale <= threemonths && endOfSale >= today;
-    });
-  }
-
-  getLowStockItems(): StockItem[] {
-    return this.stockData.filter(item => item.quantite < 20);
-  }
-
-  onSearch(event: any) {
-    const searchTerm = event.target.value.toLowerCase();
-    this.filteredStockData = this.stockData.filter(item => 
-      item.article.toLowerCase().includes(searchTerm) ||
-      item.constructeur.toLowerCase().includes(searchTerm) ||
-      item.categorie.toLowerCase().includes(searchTerm)
-    );
   }
 }
