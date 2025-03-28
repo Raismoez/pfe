@@ -1,69 +1,53 @@
-<div class="main-container">
-  <app-sidebar></app-sidebar>
-  
-  <main class="main-content">
-    <div class="search-container">
-      <div class="search-bar">
-        <i class="fas fa-search"></i>
-        <input type="text" placeholder="Rechercher un article...">
-      </div>
-      <img src="assets/images/avatar.png" alt="Avatar" class="avatar">
+<div class="form-section">
+  <h3>Ajouter un article</h3>
+  <form>
+    <div class="form-group">
+      <label>Nom article</label>
+      <input type="text" placeholder="Veuillez saisir le nom de l'article" class="form-control">
     </div>
 
-    <div class="content-wrapper">
-      <div class="page-header">
-        <h1>Liste des articles</h1>
-        <button class="btn-add">Ajouter un article</button>
-      </div>
+    <div class="form-group">
+      <label>Constructeur</label>
+      <input type="text" placeholder="Veuillez saisir le nom du constructeur" class="form-control">
+    </div>
 
-      <div class="content-container">
-        <!-- Form Section -->
-        <div class="form-section">
-          <h3>Ajouter un article</h3>
-          <form>
-            <div class="form-group">
-              <label>Nom de l'article</label>
-              <input type="text" placeholder="Veuillez saisir le nom" class="form-control">
-            </div>
+    <div class="form-group">
+      <label>Catégorie</label>
+      <select class="form-control">
+        <option value="">Choisir une catégorie</option>
+        <option value="Carte NIM 4G">Carte NIM 4G</option>
+        <option value="Carte NIM FO">Carte NIM FO</option>
+        <option value="Routeur">Routeur</option>
+        <option value="Module SFP">Module SFP</option>
+        <option value="Switch">Switch</option>
+        <option value="Jarretière optique">Jarretière optique</option>
+      </select>
+    </div>
 
-            <div class="form-group">
-              <label>Catégorie</label>
-              <select class="form-control">
-                <option value="">Choisir une catégorie</option>
-                <option value="Ordinateur">Ordinateur</option>
-                <option value="Imprimante">Imprimante</option>
-                <option value="Accessoire">Accessoire</option>
-              </select>
-            </div>
+    <div class="form-group">
+      <label>Quantité</label>
+      <input type="number" placeholder="Veuillez saisir la quantité" class="form-control">
+    </div>
 
-            <div class="form-group">
-              <label>Quantité</label>
-              <input type="number" placeholder="Veuillez saisir la quantité" class="form-control">
-            </div>
+    <div class="form-group">
+      <label>End of Sale</label>
+      <input type="date" class="form-control">
+    </div>
 
-            <div class="form-group">
-              <label>Prix unitaire</label>
-              <input type="number" placeholder="Veuillez saisir le prix" class="form-control">
-            </div>
+    <div class="form-group">
+      <label>End of Support</label>
+      <input type="date" class="form-control">
+    </div>
 
-            <div class="form-group">
-              <label>Date de fabrication</label>
-              <input type="date" class="form-control">
-            </div>
+    <div class="form-group">
+      <label>Image</label>
+      <input type="file" class="form-control">
+    </div>
 
-            <div class="form-group">
-              <label>Date d'expiration</label>
-              <input type="date" class="form-control">
-            </div>
+    <button type="submit" class="btn-valider">Valider</button>
+  </form>
+</div>
 
-            <div class="form-group">
-              <label>Image</label>
-              <input type="file" class="form-control">
-            </div>
-
-            <button type="submit" class="btn-valider">Valider</button>
-          </form>
-        </div>
 
         <!-- Table Section -->
         <div class="table-section">
@@ -71,28 +55,52 @@
             <thead>
               <tr>
                 <th>Nom article</th>
+                <th>Constructeur</th>
                 <th>Catégorie</th>
+                <th>Date</th>
                 <th>Quantité</th>
-                <th>Prix unitaire</th>
-                <th>Date fabrication</th>
-                <th>Date expiration</th>
-                <th>Image</th>
+                <th>End of sale</th>
+                <th>End of support</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>HP</td>
-                <td>Ordinateur</td>
-                <td>3</td>
-                <td>200000</td>
-                <td>15/09/2022</td>
-                <td>18/09/2022</td>
-                <td><img src="assets/images/hp.png" alt="HP" class="product-image"></td>
-                <td>
-                  <button class="btn-edit"><i class="fas fa-edit"></i></button>
-                </td>
-              </tr>
+              <!-- Articles -->
+              <tr><td>NIM-4G-LTE-GA</td><td>CISCO</td><td>Carte NIM 4G</td><td>01/01/2022</td><td>100</td><td>31-oct-23</td><td>31-oct-28</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>NIM-1GE-CU-SFP</td><td>CISCO</td><td>Carte NIM FO</td><td>01/01/2022</td><td>90</td><td>31-oct-23</td><td>31-oct-28</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>Carte NIM FXS 4ports</td><td>CISCO</td><td>Carte NIM FXS</td><td>01/01/2022</td><td>70</td><td>31-oct-23</td><td>31-oct-28</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>NIM-VDSL2/ADSL/2/2+</td><td>CISCO</td><td>Carte NIM xDSL</td><td>01/01/2022</td><td>50</td><td>31-oct-23</td><td>31-oct-28</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>Jarretière optique FC/LC 2m duplex</td><td>CISCO</td><td>Jarretière optique</td><td>05/01/2022</td><td>100</td><td>Not announced</td><td>Not announced</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>Jarretière optique FC/LC 2m SM</td><td>CISCO</td><td>Jarretière optique</td><td>05/01/2022</td><td>150</td><td>Not announced</td><td>Not announced</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>Jarretière optique LC/LC 2m duplex</td><td>CISCO</td><td>Jarretière optique</td><td>05/01/2022</td><td>80</td><td>Not announced</td><td>Not announced</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>Jarretière optique LCPC/LCPC 2m SM</td><td>CISCO</td><td>Jarretière optique</td><td>05/01/2022</td><td>120</td><td>Not announced</td><td>Not announced</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>GLC-BX-D</td><td>CISCO</td><td>Module SFP</td><td>10/01/2022</td><td>5</td><td>31-janv-22</td><td>31-janv-27</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>GLC-BX-U</td><td>CISCO</td><td>Module SFP</td><td>10/01/2022</td><td>0</td><td>31-janv-22</td><td>31-janv-27</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>GLC-FE-100BX-D= A</td><td>CISCO</td><td>Module SFP</td><td>10/01/2022</td><td>10</td><td>16-août-21</td><td>31-août-26</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>GLC-FE-100BX-U= A</td><td>CISCO</td><td>Module SFP</td><td>10/01/2022</td><td>30</td><td>16-août-21</td><td>31-août-26</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>Optical Transceiver(eSFP,1310nm,STM1,-15dBm~-8dBm,-31dBm,Singlemode,LC,15Km)</td><td>CISCO</td><td>Module SFP</td><td>10/01/2022</td><td>200</td><td>30-avr-22</td><td>30-avr-27</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>C1117-4P</td><td>CISCO</td><td>Routeur</td><td>15/01/2022</td><td>180</td><td>31-oct-27</td><td>31-oct-32</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>C1117-4PWE</td><td>CISCO</td><td>Routeur</td><td>15/01/2022</td><td>180</td><td>31-oct-27</td><td>31-oct-32</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>C1121X-8P</td><td>CISCO</td><td>Routeur</td><td>15/01/2022</td><td>180</td><td>31-oct-27</td><td>31-oct-32</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>C891F-K9 avec support de la voix</td><td>CISCO</td><td>Routeur</td><td>15/01/2022</td><td>90</td><td>31-janv-23</td><td>31-janv-28</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>ISR4221/K9</td><td>CISCO</td><td>Routeur</td><td>15/01/2022</td><td>100</td><td>31-août-23</td><td>31-août-28</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>ISR4321-V/K9</td><td>CISCO</td><td>Routeur</td><td>15/01/2022</td><td>100</td><td>31-août-23</td><td>31-août-28</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>ISR4331-V/K9</td><td>CISCO</td><td>Routeur</td><td>15/01/2022</td><td>100</td><td>31-août-23</td><td>31-août-28</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>ISR4351-V/K9</td><td>CISCO</td><td>Routeur</td><td>15/01/2022</td><td>100</td><td>31-août-23</td><td>31-août-28</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>C887VA-K9 avec service VOIP activé</td><td>CISCO</td><td>Routeur</td><td>15/01/2022</td><td>100</td><td>31-janv-22</td><td>31-janv-27</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>C887VAG+7-K9</td><td>CISCO</td><td>Routeur</td><td>15/01/2022</td><td>50</td><td>31-janv-22</td><td>31-janv-27</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>C887VAG-4G-GA-K9</td><td>CISCO</td><td>Routeur</td><td>15/01/2022</td><td>80</td><td>31-janv-22</td><td>31-janv-27</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>NE520-4G4Z-A</td><td>CISCO</td><td>Switch</td><td>25/01/2022</td><td>9</td><td>30-juin-23</td><td>30-juin-28</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>Optical Transceiver,eSFP,FE,BIDI single-mode</td><td>Huawei</td><td>Module SFP</td><td>26/01/2022</td><td>0</td><td>31-juil-22</td><td>31-juil-27</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>Optical Transceiver,eSFP,GE,BIDI Single-mode</td><td>Huawei</td><td>Module SFP</td><td>26/01/2022</td><td>0</td><td>31-juil-22</td><td>31-juil-27</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>AR651</td><td>Huawei</td><td>Routeur</td><td>26/01/2022</td><td>100</td><td>31-déc-23</td><td>31-déc-28</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>S5735-L8T4S-A1</td><td>Huawei</td><td>Switch</td><td>26/01/2022</td><td>100</td><td>Not announced</td><td>Not announced</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>AR651</td><td>Huawei</td><td>Routeur</td><td>30/01/2022</td><td>0</td><td>31-déc-23</td><td>31-déc-28</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>AR617VW-LTE4EA</td><td>Huawei</td><td>Routeur</td><td>30/01/2022</td><td>100</td><td>31-déc-25</td><td>31-déc-30</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>AR657W</td><td>Huawei</td><td>Routeur</td><td>30/01/2022</td><td>150</td><td>31-déc-24</td><td>31-déc-29</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>FortiGate 80F</td><td>Fortinet</td><td>Routeur</td><td>30/01/2022</td><td>200</td><td>Not announced</td><td>Not announced</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>FortiGate 80F-DSL</td><td>Fortinet</td><td>Routeur</td><td>30/01/2022</td><td>100</td><td>Not announced</td><td>Not announced</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>FortiGate-80F-2R-3G4G-DSL</td><td>Fortinet</td><td>Routeur</td><td>30/01/2022</td><td>0</td><td>Not announced</td><td>Not announced</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
             </tbody>
           </table>
         </div>
