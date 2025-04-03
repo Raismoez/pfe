@@ -1,53 +1,69 @@
-<div class="form-section">
-  <h3>Ajouter un article</h3>
-  <form>
-    <div class="form-group">
-      <label>Nom article</label>
-      <input type="text" placeholder="Veuillez saisir le nom de l'article" class="form-control">
+<div class="main-container">
+  <app-sidebar></app-sidebar>
+  
+  <main class="main-content">
+    <div class="search-container">
+      <div class="search-bar">
+        <i class="fas fa-search"></i>
+        <input type="text" placeholder="Rechercher un article...">
+      </div>
+      <img src="assets/images/avatar.png" alt="Avatar" class="avatar">
     </div>
 
-    <div class="form-group">
-      <label>Constructeur</label>
-      <input type="text" placeholder="Veuillez saisir le nom du constructeur" class="form-control">
-    </div>
+    <div class="content-wrapper">
+      <div class="page-header">
+        <h1>Liste des articles</h1>
+        <button class="btn-add">Ajouter un article</button>
+      </div>
 
-    <div class="form-group">
-      <label>Catégorie</label>
-      <select class="form-control">
-        <option value="">Choisir une catégorie</option>
-        <option value="Carte NIM 4G">Carte NIM 4G</option>
-        <option value="Carte NIM FO">Carte NIM FO</option>
-        <option value="Routeur">Routeur</option>
-        <option value="Module SFP">Module SFP</option>
-        <option value="Switch">Switch</option>
-        <option value="Jarretière optique">Jarretière optique</option>
-      </select>
-    </div>
+      <div class="content-container">
+        <!-- Form Section -->
+        <div class="form-section">
+          <h3>Ajouter un article</h3>
+          <form>
+            <div class="form-group">
+              <label>Nom de l'article</label>
+              <input type="text" placeholder="Veuillez saisir le nom" class="form-control">
+            </div>
 
-    <div class="form-group">
-      <label>Quantité</label>
-      <input type="number" placeholder="Veuillez saisir la quantité" class="form-control">
-    </div>
+            <div class="form-group">
+              <label>Catégorie</label>
+              <select class="form-control">
+                <option value="">Choisir une catégorie</option>
+                <option value="Ordinateur">Ordinateur</option>
+                <option value="Imprimante">Imprimante</option>
+                <option value="Accessoire">Accessoire</option>
+              </select>
+            </div>
 
-    <div class="form-group">
-      <label>End of Sale</label>
-      <input type="date" class="form-control">
-    </div>
+            <div class="form-group">
+              <label>Quantité</label>
+              <input type="number" placeholder="Veuillez saisir la quantité" class="form-control">
+            </div>
 
-    <div class="form-group">
-      <label>End of Support</label>
-      <input type="date" class="form-control">
-    </div>
+            <div class="form-group">
+              <label>Prix unitaire</label>
+              <input type="number" placeholder="Veuillez saisir le prix" class="form-control">
+            </div>
 
-    <div class="form-group">
-      <label>Image</label>
-      <input type="file" class="form-control">
-    </div>
+            <div class="form-group">
+              <label>Date de fabrication</label>
+              <input type="date" class="form-control">
+            </div>
 
-    <button type="submit" class="btn-valider">Valider</button>
-  </form>
-</div>
+            <div class="form-group">
+              <label>Date d'expiration</label>
+              <input type="date" class="form-control">
+            </div>
 
+            <div class="form-group">
+              <label>Image</label>
+              <input type="file" class="form-control">
+            </div>
+
+            <button type="submit" class="btn-valider">Valider</button>
+          </form>
+        </div>
 
         <!-- Table Section -->
         <div class="table-section">

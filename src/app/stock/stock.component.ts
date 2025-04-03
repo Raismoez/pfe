@@ -1,211 +1,145 @@
 import { Component, OnInit } from '@angular/core';
-import { User, UserService } from '../Service/user.service';
-import { Router, RouterModule } from '@angular/router';
+import { StockService } from '../service/stock.service';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { SidebarComponent } from '../components/sidebar/sidebar.component';
 import { HeaderComponent } from '../components/header/header.component';
 
+interface Stock {
+  id: number;
+  article: string;
+  constructeur: string;
+  categorie: string;
+  date: string;
+  quantite: number;
+  endOfSale: string;
+  endOfSupport: string;
+}
+
 @Component({
   selector: 'app-stock',
   standalone: true,
-   imports: [CommonModule, FormsModule, HttpClientModule, RouterModule,SidebarComponent,HeaderComponent],
+  imports: [CommonModule, FormsModule, HttpClientModule, SidebarComponent, HeaderComponent],
   templateUrl: './stock.component.html',
   styleUrl: './stock.component.css'
 })
 export class StockComponent implements OnInit {
-  users: User[] = [];
-  filteredUsers: User[] = [];
+  stocks: Stock[] = [];
+  filteredStocks: Stock[] = [];
   searchQuery: string = '';
-  public user = JSON.parse(sessionStorage.getItem("user") || '{}');
-  showUserModal: boolean = false;
+  showStockModal: boolean = false;
   editMode: boolean = false;
-  currentUser: User = {
-    id: 0,
-    identifiant: '',
-    nomUtilisateur: '',
-    email: '',
-    idRole: '',
-    statut: 'Actif',
-    password: ''
-  };
-
-  constructor(private router: Router, private userService: UserService) {}
+  currentStock: Stock = this.initStock();
+  
+  constructor(private router: Router, private stockService: StockService) {}
 
   ngOnInit() {
-    console.log(this.user);
-    this.loadUsers();
+    this.loadStocks();
   }
 
-  // Fonction pour récupérer le rôle d'un utilisateur
-  getRole(idRole: any): string {
-    if (idRole == 1) return 'Admin';
-    if (idRole == 2) return 'Agent commercial';
-    if (idRole == 3) return 'Agent technique';
-    return 'Rôle inconnu';
+  // Initialiser un stock vide
+  private initStock(): Stock {
+    return {
+      id: 0,
+      article: '',
+      constructeur: '',
+      categorie: '',
+      date: '',
+      quantite: 0,
+      endOfSale: '',
+      endOfSupport: ''
+    };
   }
 
-  // Fonction pour charger tous les utilisateurs
-  loadUsers() {
-    this.userService.getAllUsers().subscribe(
+  // Charger tous les stocks
+  loadStocks() {
+    this.stockService.getAllStocks().subscribe(
       (data) => {
-        this.users = data;
-        this.filteredUsers = [...this.users];
+        this.stocks = data;
+        this.filteredStocks = [...this.stocks];
       },
       (error) => {
-        console.error('Erreur lors du chargement des utilisateurs', error);
+        console.error('Erreur lors du chargement des stocks', error);
       }
     );
   }
 
-  // Fonction pour rechercher les utilisateurs
+  // Recherche dans le stock
   onSearch() {
     if (this.searchQuery.trim()) {
-      this.userService.searchUsers(this.searchQuery).subscribe(
-        (data) => {
-          this.filteredUsers = data;
-        },
-        (error) => {
-          console.error('Erreur lors de la recherche', error);
-        }
+      this.filteredStocks = this.stocks.filter(stock =>
+        stock.article.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+        stock.constructeur.toLowerCase().includes(this.searchQuery.toLowerCase())
       );
     } else {
-      this.filteredUsers = [...this.users];
+      this.filteredStocks = [...this.stocks];
     }
   }
 
-  // Ouvrir la modal pour ajouter un utilisateur
-  openAddUserModal() {
+  // Ouvrir le modal pour ajouter un stock
+  openAddStockModal() {
     this.editMode = false;
-    this.currentUser = {
-      id: 0,
-      identifiant: '',
-      nomUtilisateur: '',
-      email: '',
-      idRole: '',
-      statut: 'Actif',
-      password: ''
-    };
-    this.showUserModal = true;
+    this.currentStock = this.initStock();
+    this.showStockModal = true;
   }
 
-  // Ouvrir la modal pour modifier un utilisateur
-  editUser(user: User) {
+  // Ouvrir le modal pour modifier un stock
+  editStock(stock: Stock) {
     this.editMode = true;
-    this.currentUser = { ...user };
-    this.showUserModal = true;
+    this.currentStock = { ...stock };
+    this.showStockModal = true;
   }
-  
-// Supprimer un utilisateur avec confirmation
-deleteUser(userId: number) {
-  const confirmation = window.confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');
-  
-  if (confirmation) {
-    this.userService.deleteUser(userId).subscribe(
-      () => {
-        // Si l'utilisateur est supprimé, filtrer la liste
-        this.users = this.users.filter(u => u.id !== userId);
-        this.filteredUsers = [...this.users];
-      },
-      (error) => {
-        console.error('Erreur lors de la suppression', error);
-      }
-    );
-  } else {
-    console.log('Suppression annulée.');
-  }
-}
 
-
-  // Bloquer ou débloquer un utilisateur
-  blockUser(userId: number) {
-    this.userService.toggleUserStatus(userId).subscribe(
-      (updatedUser) => {
-        const index = this.users.findIndex(u => u.id === userId);
-        if (index !== -1) {
-          this.users[index] = updatedUser;
-          this.filteredUsers = [...this.users];
+  // Supprimer un stock avec confirmation
+  deleteStock(stockId: number) {
+    const confirmation = window.confirm('Êtes-vous sûr de vouloir supprimer cet article du stock ?');
+    if (confirmation) {
+      this.stockService.deleteStock(stockId).subscribe(
+        () => {
+          this.stocks = this.stocks.filter(s => s.id !== stockId);
+          this.filteredStocks = [...this.stocks];
+        },
+        (error) => {
+          console.error('Erreur lors de la suppression', error);
         }
-      },
-      (error) => {
-        console.error('Erreur lors du changement de statut', error);
-      }
-    );
+      );
+    }
   }
 
-  // Soumettre le formulaire d'utilisateur pour création ou mise à jour
-  onSubmitUserForm() {
-  console.log('Envoi du formulaire utilisateur:', this.currentUser);
-
-  if (this.editMode) {
-    this.userService.updateUser(this.currentUser.id, this.currentUser).subscribe(
-      (updatedUser) => {
-        console.log('Utilisateur mis à jour avec succès:', updatedUser);
-        const index = this.users.findIndex(u => u.id === updatedUser.id);
-        if (index !== -1) {
-          this.users[index] = updatedUser;
-          this.filteredUsers = [...this.users];
+  // Envoi du formulaire (ajout ou modification)
+  onSubmitStockForm() {
+    if (this.editMode) {
+      this.stockService.updateStock(this.currentStock.id, this.currentStock).subscribe(
+        (updatedStock) => {
+          const index = this.stocks.findIndex(s => s.id === updatedStock.id);
+          if (index !== -1) {
+            this.stocks[index] = updatedStock;
+            this.filteredStocks = [...this.stocks];
+          }
+          this.closeStockModal();
+        },
+        (error) => {
+          console.error('Erreur lors de la mise à jour', error);
         }
-        this.closeUserModal();
-      },
-      (error) => {
-        console.error('Erreur détaillée lors de la mise à jour:', error);
-      }
-    );
-  } else {
-    console.log('Tentative de création d\'utilisateur avec:', this.currentUser);
-    this.userService.createUser(this.currentUser).subscribe(
-      (newUser) => {
-        console.log('Utilisateur créé avec succès:', newUser);
-        this.users.push(newUser);
-        this.filteredUsers = [...this.users];
-        this.closeUserModal();
-      },
-      (error) => {
-        console.error('Erreur détaillée lors de la création:', error);
-      }
-    );
+      );
+    } else {
+      this.stockService.createStock(this.currentStock).subscribe(
+        (newStock) => {
+          this.stocks.push(newStock);
+          this.filteredStocks = [...this.stocks];
+          this.closeStockModal();
+        },
+        (error) => {
+          console.error('Erreur lors de l’ajout du stock', error);
+        }
+      );
+    }
+  }
+
+  // Fermer le modal
+  closeStockModal() {
+    this.showStockModal = false;
   }
 }
-
-  
-  closeUserModal() {
-    this.showUserModal = false;
-  }
- 
-
-showDeleteConfirmation: boolean = false;
-userToDelete: User | null = null;
-
-
-confirmDelete(user: User): void {
-  this.userToDelete = user;
-  this.showDeleteConfirmation = true;
-}
-
-
-deleteUserConfirmed(): void {
-  if (this.userToDelete) {
-    this.userService.deleteUser(this.userToDelete.id).subscribe(
-      () => {
-        this.users = this.users.filter(u => u.id !== this.userToDelete?.id);
-        this.filteredUsers = [...this.users];
-        this.cancelDelete();
-      },
-      (error) => {
-        console.error('Erreur lors de la suppression', error);
-        this.cancelDelete();
-      }
-    );
-  }
-}
-
-cancelDelete(): void {
-  this.showDeleteConfirmation = false;
-  this.userToDelete = null;
-}
-
-}
-
-
