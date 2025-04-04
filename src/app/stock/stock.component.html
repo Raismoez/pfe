@@ -1,126 +1,242 @@
-<div class="main-container">
-  <app-sidebar></app-sidebar>
-  
-  <main class="main-content">
+<app-sidebar></app-sidebar>
+<main class="main-content">
+  <app-header></app-header>
+<div class="dashboard-container">
+  <!-- Top Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon" [style.background]="'rgba(59, 130, 246, 0.1)'">
+        <i class="fas fa-box text-blue-500"></i>
+      </div>
+      <div class="stat-content">
+        <h3>Total Articles</h3>
+        <p class="stat-number">{{ stocks.length }}</p>
+      </div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon" [style.background]="'rgba(16, 185, 129, 0.1)'">
+        <i class="fas fa-warehouse text-green-500"></i>
+      </div>
+      <div class="stat-content">
+        <h3>En Stock</h3>
+        <p class="stat-number">{{ getTotalQuantity() }}</p>
+      </div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon" [style.background]="'rgba(245, 158, 11, 0.1)'">
+        <i class="fas fa-exclamation-triangle text-yellow-500"></i>
+      </div>
+      <div class="stat-content">
+        <h3>Stock Faible</h3>
+        <p class="stat-number">{{ getLowStockCount() }}</p>
+      </div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon" [style.background]="'rgba(239, 68, 68, 0.1)'">
+        <i class="fas fa-clock text-red-500"></i>
+      </div>
+      <div class="stat-content">
+        <h3>Fin de Support</h3>
+        <p class="stat-number">{{ getEndOfSupportCount() }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search and Filter Section -->
+  <div class="controls-section">
     <div class="search-container">
-      <div class="search-bar">
-        <i class="fas fa-search"></i>
-        <input type="text" placeholder="Rechercher un article...">
-      </div>
-      <img src="assets/images/avatar.png" alt="Avatar" class="avatar">
+      <i class="fas fa-search search-icon"></i>
+      <input 
+        type="text" 
+        [(ngModel)]="searchQuery" 
+        (ngModelChange)="onSearch()"
+        placeholder="Rechercher un article..." 
+        class="search-input"
+      >
     </div>
+    
+    <div class="filters">
+      <select [(ngModel)]="selectedCategory" (change)="applyFilters()" class="filter-select">
+        <option value="">Toutes les catégories</option>
+        <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+      </select>
+      
+      <select [(ngModel)]="sortBy" (change)="applyFilters()" class="filter-select">
+        <option value="article">Nom (A-Z)</option>
+        <option value="-article">Nom (Z-A)</option>
+        <option value="quantite">Quantité (Croissant)</option>
+        <option value="-quantite">Quantité (Décroissant)</option>
+      </select>
+      
+      <button class="btn-add" (click)="openAddStockModal()">
+        <i class="fas fa-plus"></i>
+        Nouvel Article
+      </button>
+    </div>
+  </div>
 
-    <div class="content-wrapper">
-      <div class="page-header">
-        <h1>Liste des articles</h1>
-        <button class="btn-add">Ajouter un article</button>
-      </div>
-
-      <div class="content-container">
-        <!-- Form Section -->
-        <div class="form-section">
-          <h3>Ajouter un article</h3>
-          <form>
-            <div class="form-group">
-              <label>Nom de l'article</label>
-              <input type="text" placeholder="Veuillez saisir le nom" class="form-control">
-            </div>
-
-            <div class="form-group">
-              <label>Catégorie</label>
-              <select class="form-control">
-                <option value="">Choisir une catégorie</option>
-                <option value="Ordinateur">Ordinateur</option>
-                <option value="Imprimante">Imprimante</option>
-                <option value="Accessoire">Accessoire</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label>Quantité</label>
-              <input type="number" placeholder="Veuillez saisir la quantité" class="form-control">
-            </div>
-
-            <div class="form-group">
-              <label>Prix unitaire</label>
-              <input type="number" placeholder="Veuillez saisir le prix" class="form-control">
-            </div>
-
-            <div class="form-group">
-              <label>Date de fabrication</label>
-              <input type="date" class="form-control">
-            </div>
-
-            <div class="form-group">
-              <label>Date d'expiration</label>
-              <input type="date" class="form-control">
-            </div>
-
-            <div class="form-group">
-              <label>Image</label>
-              <input type="file" class="form-control">
-            </div>
-
-            <button type="submit" class="btn-valider">Valider</button>
-          </form>
+  <!-- Stock Cards Grid -->
+  <div class="stock-grid">
+    <div *ngFor="let stock of filteredStocks" class="stock-card" [class.low-stock]="stock.quantite < 5">
+      <div class="stock-header">
+        <span class="category-badge" [class]="'category-' + stock.categorie.toLowerCase()">
+          {{ stock.categorie }}
+        </span>
+        <div class="stock-actions">
+          <button class="action-btn edit" (click)="editStock(stock)">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button class="action-btn delete" (click)="confirmDelete(stock)">
+            <i class="fas fa-trash"></i>
+          </button>
         </div>
-
-        <!-- Table Section -->
-        <div class="table-section">
-          <table>
-            <thead>
-              <tr>
-                <th>Nom article</th>
-                <th>Constructeur</th>
-                <th>Catégorie</th>
-                <th>Date</th>
-                <th>Quantité</th>
-                <th>End of sale</th>
-                <th>End of support</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Articles -->
-              <tr><td>NIM-4G-LTE-GA</td><td>CISCO</td><td>Carte NIM 4G</td><td>01/01/2022</td><td>100</td><td>31-oct-23</td><td>31-oct-28</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>NIM-1GE-CU-SFP</td><td>CISCO</td><td>Carte NIM FO</td><td>01/01/2022</td><td>90</td><td>31-oct-23</td><td>31-oct-28</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>Carte NIM FXS 4ports</td><td>CISCO</td><td>Carte NIM FXS</td><td>01/01/2022</td><td>70</td><td>31-oct-23</td><td>31-oct-28</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>NIM-VDSL2/ADSL/2/2+</td><td>CISCO</td><td>Carte NIM xDSL</td><td>01/01/2022</td><td>50</td><td>31-oct-23</td><td>31-oct-28</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>Jarretière optique FC/LC 2m duplex</td><td>CISCO</td><td>Jarretière optique</td><td>05/01/2022</td><td>100</td><td>Not announced</td><td>Not announced</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>Jarretière optique FC/LC 2m SM</td><td>CISCO</td><td>Jarretière optique</td><td>05/01/2022</td><td>150</td><td>Not announced</td><td>Not announced</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>Jarretière optique LC/LC 2m duplex</td><td>CISCO</td><td>Jarretière optique</td><td>05/01/2022</td><td>80</td><td>Not announced</td><td>Not announced</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>Jarretière optique LCPC/LCPC 2m SM</td><td>CISCO</td><td>Jarretière optique</td><td>05/01/2022</td><td>120</td><td>Not announced</td><td>Not announced</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>GLC-BX-D</td><td>CISCO</td><td>Module SFP</td><td>10/01/2022</td><td>5</td><td>31-janv-22</td><td>31-janv-27</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>GLC-BX-U</td><td>CISCO</td><td>Module SFP</td><td>10/01/2022</td><td>0</td><td>31-janv-22</td><td>31-janv-27</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>GLC-FE-100BX-D= A</td><td>CISCO</td><td>Module SFP</td><td>10/01/2022</td><td>10</td><td>16-août-21</td><td>31-août-26</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>GLC-FE-100BX-U= A</td><td>CISCO</td><td>Module SFP</td><td>10/01/2022</td><td>30</td><td>16-août-21</td><td>31-août-26</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>Optical Transceiver(eSFP,1310nm,STM1,-15dBm~-8dBm,-31dBm,Singlemode,LC,15Km)</td><td>CISCO</td><td>Module SFP</td><td>10/01/2022</td><td>200</td><td>30-avr-22</td><td>30-avr-27</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>C1117-4P</td><td>CISCO</td><td>Routeur</td><td>15/01/2022</td><td>180</td><td>31-oct-27</td><td>31-oct-32</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>C1117-4PWE</td><td>CISCO</td><td>Routeur</td><td>15/01/2022</td><td>180</td><td>31-oct-27</td><td>31-oct-32</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>C1121X-8P</td><td>CISCO</td><td>Routeur</td><td>15/01/2022</td><td>180</td><td>31-oct-27</td><td>31-oct-32</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>C891F-K9 avec support de la voix</td><td>CISCO</td><td>Routeur</td><td>15/01/2022</td><td>90</td><td>31-janv-23</td><td>31-janv-28</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>ISR4221/K9</td><td>CISCO</td><td>Routeur</td><td>15/01/2022</td><td>100</td><td>31-août-23</td><td>31-août-28</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>ISR4321-V/K9</td><td>CISCO</td><td>Routeur</td><td>15/01/2022</td><td>100</td><td>31-août-23</td><td>31-août-28</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>ISR4331-V/K9</td><td>CISCO</td><td>Routeur</td><td>15/01/2022</td><td>100</td><td>31-août-23</td><td>31-août-28</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>ISR4351-V/K9</td><td>CISCO</td><td>Routeur</td><td>15/01/2022</td><td>100</td><td>31-août-23</td><td>31-août-28</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>C887VA-K9 avec service VOIP activé</td><td>CISCO</td><td>Routeur</td><td>15/01/2022</td><td>100</td><td>31-janv-22</td><td>31-janv-27</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>C887VAG+7-K9</td><td>CISCO</td><td>Routeur</td><td>15/01/2022</td><td>50</td><td>31-janv-22</td><td>31-janv-27</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>C887VAG-4G-GA-K9</td><td>CISCO</td><td>Routeur</td><td>15/01/2022</td><td>80</td><td>31-janv-22</td><td>31-janv-27</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>NE520-4G4Z-A</td><td>CISCO</td><td>Switch</td><td>25/01/2022</td><td>9</td><td>30-juin-23</td><td>30-juin-28</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>Optical Transceiver,eSFP,FE,BIDI single-mode</td><td>Huawei</td><td>Module SFP</td><td>26/01/2022</td><td>0</td><td>31-juil-22</td><td>31-juil-27</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>Optical Transceiver,eSFP,GE,BIDI Single-mode</td><td>Huawei</td><td>Module SFP</td><td>26/01/2022</td><td>0</td><td>31-juil-22</td><td>31-juil-27</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>AR651</td><td>Huawei</td><td>Routeur</td><td>26/01/2022</td><td>100</td><td>31-déc-23</td><td>31-déc-28</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>S5735-L8T4S-A1</td><td>Huawei</td><td>Switch</td><td>26/01/2022</td><td>100</td><td>Not announced</td><td>Not announced</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>AR651</td><td>Huawei</td><td>Routeur</td><td>30/01/2022</td><td>0</td><td>31-déc-23</td><td>31-déc-28</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>AR617VW-LTE4EA</td><td>Huawei</td><td>Routeur</td><td>30/01/2022</td><td>100</td><td>31-déc-25</td><td>31-déc-30</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>AR657W</td><td>Huawei</td><td>Routeur</td><td>30/01/2022</td><td>150</td><td>31-déc-24</td><td>31-déc-29</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>FortiGate 80F</td><td>Fortinet</td><td>Routeur</td><td>30/01/2022</td><td>200</td><td>Not announced</td><td>Not announced</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>FortiGate 80F-DSL</td><td>Fortinet</td><td>Routeur</td><td>30/01/2022</td><td>100</td><td>Not announced</td><td>Not announced</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-              <tr><td>FortiGate-80F-2R-3G4G-DSL</td><td>Fortinet</td><td>Routeur</td><td>30/01/2022</td><td>0</td><td>Not announced</td><td>Not announced</td><td><button class="btn-edit"><i class="fas fa-edit"></i></button></td></tr>
-            </tbody>
-          </table>
+      </div>
+      
+      <h3 class="stock-title">{{ stock.article }}</h3>
+      <p class="stock-manufacturer">{{ stock.constructeur }}</p>
+      
+      <div class="stock-details">
+        <div class="detail-item">
+          <i class="fas fa-cubes"></i>
+          <span>{{ stock.quantite }} unités</span>
+        </div>
+        <div class="detail-item">
+          <i class="fas fa-calendar"></i>
+          <span>{{ stock.date | date:'dd/MM/yyyy' }}</span>
+        </div>
+      </div>
+      
+      <div class="stock-footer">
+        <div class="support-info" *ngIf="stock.endOfSupport">
+          <i class="fas fa-exclamation-circle"></i>
+          Fin de support: {{ stock.endOfSupport | date:'dd/MM/yyyy' }}
         </div>
       </div>
     </div>
-  </main>
+  </div>
+</div>
+
+
+<!-- Modal pour ajouter/modifier un article -->
+<div class="modal" *ngIf="showStockModal">
+  <div class="modal-content">
+    <h2>{{ editMode ? 'Modifier' : 'Ajouter' }} un article</h2>
+    <form (ngSubmit)="onSubmitStockForm()">
+      <div class="info-group">
+        <label>Nom de l'article</label>
+        <input 
+          type="text" 
+          [(ngModel)]="currentStock.article" 
+          name="article" 
+          placeholder="Veuillez saisir le nom" 
+          required 
+          #articleInput="ngModel"
+          [ngClass]="{ 'invalid': articleInput.invalid && articleInput.touched }"
+        >
+        <div *ngIf="articleInput.invalid && articleInput.touched" class="alert">
+          Le nom de l'article est requis.
+        </div>
+      </div>
+
+      <div class="info-group">
+        <label>Constructeur</label>
+        <input 
+          type="text" 
+          [(ngModel)]="currentStock.constructeur" 
+          name="constructeur" 
+          placeholder="Veuillez saisir le constructeur" 
+          required
+          #constructeurInput="ngModel"
+          [ngClass]="{ 'invalid': constructeurInput.invalid && constructeurInput.touched }"
+        >
+        <div *ngIf="constructeurInput.invalid && constructeurInput.touched" class="alert">
+          Le constructeur est requis.
+        </div>
+      </div>
+
+      <div class="info-group">
+        <label>Catégorie</label>
+        <select 
+          [(ngModel)]="currentStock.categorie" 
+          name="categorie" 
+          required
+          #categorieInput="ngModel"
+          [ngClass]="{ 'invalid': categorieInput.invalid && categorieInput.touched }"
+        >
+          <option value="">Choisir une catégorie</option>
+          <option value="Carte NIM">Carte NIM</option>
+          <option value="Jarretière optique">Jarretière optique</option>
+          <option value="Module SFP">Module SFP</option>
+          <option value="Routeur">Routeur</option>
+          <option value="Switch">Switch</option>
+        </select>
+        <div *ngIf="categorieInput.invalid && categorieInput.touched" class="alert">
+          La catégorie est requise.
+        </div>
+      </div>
+
+      <div class="info-group">
+        <label>Quantité</label>
+        <input 
+          type="number" 
+          [(ngModel)]="currentStock.quantite" 
+          name="quantite" 
+          placeholder="Veuillez saisir la quantité" 
+          required
+          #quantiteInput="ngModel"
+          [ngClass]="{ 'invalid': quantiteInput.invalid && quantiteInput.touched }"
+        >
+        <div *ngIf="quantiteInput.invalid && quantiteInput.touched" class="alert">
+          La quantité est requise.
+        </div>
+      </div>
+
+      <div class="info-group">
+        <label>Date</label>
+        <input 
+          type="date" 
+          [(ngModel)]="currentStock.date" 
+          name="date" 
+          required
+          #dateInput="ngModel"
+          [ngClass]="{ 'invalid': dateInput.invalid && dateInput.touched }"
+        >
+        <div *ngIf="dateInput.invalid && dateInput.touched" class="alert">
+          La date est requise.
+        </div>
+      </div>
+
+      <div class="info-group">
+        <label>End of sale</label>
+        <input type="date" [(ngModel)]="currentStock.endOfSale" name="endOfSale">
+      </div>
+
+      <div class="info-group">
+        <label>End of support</label>
+        <input type="date" [(ngModel)]="currentStock.endOfSupport" name="endOfSupport">
+      </div>
+
+      <div class="modal-buttons">
+        <button type="submit" class="btn primary" [disabled]="articleInput.invalid || constructeurInput.invalid || categorieInput.invalid || quantiteInput.invalid || dateInput.invalid">
+          {{ editMode ? 'Enregistrer' : 'Ajouter' }}
+        </button>
+        <button type="button" class="btn secondary" (click)="closeStockModal()">Annuler</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal de confirmation de suppression -->
+<div class="modal delete-modal" *ngIf="showDeleteConfirmation">
+  <div class="modal-content">
+    <h3>Confirmation de suppression</h3>
+    <p>Êtes-vous sûr de vouloir supprimer l'article <strong>{{ stockToDelete?.article }}</strong> ?</p>
+    <div class="modal-buttons">
+      <button class="btn primary" (click)="deleteStockConfirmed()">OK</button>
+      <button class="btn secondary" (click)="cancelDelete()">Annuler</button>
+    </div>
+  </div>
 </div>
