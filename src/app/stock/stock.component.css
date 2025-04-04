@@ -212,7 +212,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #ef4444;
+  color: #4154f1;
   font-size: 0.75rem;
 }
 
@@ -581,7 +581,7 @@
 
 .date-row i {
   width: 16px;
-  color: #ef4444;
+  color: #4154f1;
 }
 
 
