@@ -65,15 +65,18 @@ export class StockComponent implements OnInit {
     return this.stocks.reduce((total, stock) => total + stock.quantite, 0);
   }
 
-  getLowStockCount(): number {
-    return this.stocks.filter(stock => stock.quantite < 5).length;
-  }
-
   getEndOfSupportCount(): number {
     const today = new Date();
     return this.stocks.filter(stock => {
       if (!stock.endOfSupport) return false;
       return new Date(stock.endOfSupport) <= today;
+    }).length;
+  }
+  getEndOfSaleCount(): number {
+    const today = new Date();
+    return this.stocks.filter(stock => {
+      if (!stock.endOfSale) return false;
+      return new Date(stock.endOfSale) <= today;
     }).length;
   }
 
