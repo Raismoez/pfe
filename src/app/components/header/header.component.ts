@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { RouterModule} from '@angular/router';
 
 @Component({
@@ -8,6 +8,11 @@ import { RouterModule} from '@angular/router';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })
-export class HeaderComponent {
-  public user = JSON.parse(sessionStorage.getItem("user") || '{}');
+export class HeaderComponent implements OnInit{
+  public user :any
+  ngOnInit(): void {
+      this.user = JSON.parse(sessionStorage.getItem("user") || '{}');
+      console.log(this.user)
+  }
+  
 }

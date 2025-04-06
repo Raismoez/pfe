@@ -73,22 +73,20 @@ export class profilAComponent implements OnInit {
     console.log('Tentative de chargement du profil pour:', identifiant);
     this.profileService.getUserProfile(identifiant).subscribe({
       next: (data) => {
-        console.log('Profil chargé avec succès:', data);
-        sessionStorage.setItem("user",JSON.stringify(data))
-        this.user = JSON.parse(sessionStorage.getItem("user") || '{}');
+       
 
         // Ensure avatar URL is properly formatted
-        let avatarUrl = data.avatarUrl || '';
-        // If the URL is not empty and doesn't start with http or data: (for preview)
-        if (avatarUrl && !avatarUrl.startsWith('http') && !avatarUrl.startsWith('data:')) {
-          // Ensure it has the full backend URL prefix
-          avatarUrl = `${this.apiBaseUrl}${avatarUrl.startsWith('/') ? '' : '/'}${avatarUrl}`;
-        }
+        // let avatarUrl = data.avatarUrl || '';
+        // // If the URL is not empty and doesn't start with http or data: (for preview)
+        // if (avatarUrl && !avatarUrl.startsWith('http') && !avatarUrl.startsWith('data:')) {
+        //   // Ensure it has the full backend URL prefix
+        //   avatarUrl = `${this.apiBaseUrl}${avatarUrl.startsWith('/') ? '' : '/'}${avatarUrl}`;
+        // }
         
         this.userProfile = {
           ...data,
           role: this.getRoleName(data.idRole),
-          avatarUrl: avatarUrl
+          // avatarUrl: avatarUrl
         };
         this.originalProfile = {...this.userProfile};
       },
@@ -164,6 +162,7 @@ export class profilAComponent implements OnInit {
         this.showMessage('Profil mis à jour avec succès');
         this.originalProfile = {...this.userProfile};
         this.isEditing = false;
+        window.location.reload()
       },
       error: (error) => {
         this.showMessage('Erreur lors de la mise à jour du profil');
@@ -212,9 +211,13 @@ export class profilAComponent implements OnInit {
         }
         
         this.userProfile.avatarUrl = avatarUrl;
+        console.log(this.userProfile)
+        sessionStorage.removeItem('user');
+        sessionStorage.setItem('user',JSON.stringify(this.userProfile))
         this.uploadingAvatar = false;
         this.selectedFile = null;
         this.updateProfile();
+        
       },
       error: (error) => {
         console.error('Détails de l\'erreur de téléchargement:', error);

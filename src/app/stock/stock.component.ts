@@ -93,34 +93,38 @@ export class StockComponent implements OnInit {
   }
 
   applyFilters() {
-    let filtered = [...this.stocks];
+  let filtered = [...this.stocks];
+  console.log(filtered);
 
-    // Apply search filter
-    if (this.searchQuery.trim()) {
-      const query = this.searchQuery.toLowerCase();
-      filtered = filtered.filter(stock =>
-        stock.article.toLowerCase().includes(query) ||
-        stock.constructeur.toLowerCase().includes(query)
-      );
-    }
-
-    // Apply category filter
-    if (this.selectedCategory) {
-      filtered = filtered.filter(stock => stock.categorie === this.selectedCategory);
-    }
-
-    // Apply sorting
-    const sortField = this.sortBy.startsWith('-') ? this.sortBy.slice(1) : this.sortBy;
-    const sortDirection = this.sortBy.startsWith('-') ? -1 : 1;
-
-    filtered.sort((a, b) => {
-      if (a[sortField as keyof Stock] < b[sortField as keyof Stock]) return -1 * sortDirection;
-      if (a[sortField as keyof Stock] > b[sortField as keyof Stock]) return 1 * sortDirection;
-      return 0;
-    });
-
-    this.filteredStocks = filtered;
+  // Apply search filter
+  if (this.searchQuery.trim()) {
+    const query = this.searchQuery.toLowerCase();
+    filtered = filtered.filter(stock =>
+      stock.categorie.toLowerCase().includes(query)
+    );
   }
+
+  // Vérifier si la catégorie sélectionnée correspond partiellement à des catégories existantes
+  const categoriesExistantes = [...new Set(filtered.map(stock => stock.categorie))];
+
+  if (this.selectedCategory && categoriesExistantes.some(cat => cat.includes(this.selectedCategory))) {
+    filtered = filtered.filter(stock => stock.categorie.includes(this.selectedCategory));
+  }
+
+  // Apply sorting
+  const sortField = this.sortBy.startsWith('-') ? this.sortBy.slice(1) : this.sortBy;
+  const sortDirection = this.sortBy.startsWith('-') ? -1 : 1;
+
+  filtered.sort((a, b) => {
+    if (a[sortField as keyof Stock] < b[sortField as keyof Stock]) return -1 * sortDirection;
+    if (a[sortField as keyof Stock] > b[sortField as keyof Stock]) return 1 * sortDirection;
+    return 0;
+  });
+
+  this.filteredStocks = filtered;
+}
+
+  
 
   onSearch() {
     this.applyFilters();

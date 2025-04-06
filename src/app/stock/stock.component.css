@@ -369,6 +369,7 @@
   gap: 0.5rem;
   font-weight: 500;
   transition: background-color 0.2s;
+  border: none;
 }
 
 .btn-add:hover {
@@ -424,13 +425,14 @@
   border-radius: 0.5rem;
   background-color: rgba(16, 185, 129, 0.1);
   color: springgreen;
-  
+  border: none;
 }
 .action-btn.delete {
   padding: 0.5rem;
   border-radius: 0.5rem;
   background-color: rgba(220, 53, 69, 0.1);
-    color: #dc3545;
+  color: #dc3545;
+  border: none;
   
 }
 
@@ -471,6 +473,7 @@
 
 .low-stock {
   border: 1px solid #ef4444;
+  background-color: rgba(220, 53, 69, 0.1);
 }
 
 /* Responsive Design */

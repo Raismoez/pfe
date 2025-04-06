@@ -34,23 +34,36 @@
         </div>
       </div>
     </div>
-  
-    <div class="charts-section">
+  <div class="row">
+    <div class="col-6">
+      <canvas #manufacturerChart></canvas>
+    </div>
+    <div class="col-6">
+      <canvas #stockEvolutionChart></canvas>
+    </div>
+    <div class="col-6">
+      <canvas #categoryChart></canvas>
+    </div>
+   
+
+  </div>
+    <!-- <div class="charts-section">
       <div class="chart-grid">
-        <div class="chart-card">
-          <h2 class="chart-title">Évolution du Stock Total</h2>
-          <canvas #stockEvolutionChart></canvas>
+        <div class="chart-card ">
+          <h2 class="chart-title">Stock par Constructeur</h2>
+          <canvas #manufacturerChart></canvas>
         </div>
         <div class="chart-card">
           <h2 class="chart-title">Distribution des Catégories</h2>
           <canvas #categoryChart></canvas>
         </div>
-        <div class="chart-card full-width">
-          <h2 class="chart-title">Stock par Constructeur</h2>
-          <canvas #manufacturerChart></canvas>
+        <div class="chart-card">
+          <h2 class="chart-title">Évolution du Stock Total</h2>
+          <canvas #stockEvolutionChart></canvas>
         </div>
+       
       </div>
-    </div>
+    </div> -->
   
      <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
         <div class="flex justify-between items-center mb-4">

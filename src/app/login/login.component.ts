@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../Service/auth.service';
+import { ProfileService } from '../Service/profil.service';
 
 @Component({
   selector: 'app-login',
@@ -15,7 +16,7 @@ export class LoginComponent implements OnInit {
   // Champs du formulaire
   identifiant: string = '';
   password: string = '';
-  
+  user: any;
   // Messages d'erreur
   messageErreurIdentifiant: string = '';
   messageErreurPassword: string = '';
@@ -28,7 +29,8 @@ export class LoginComponent implements OnInit {
   
   constructor(
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private profileService: ProfileService
   ) {}
   
   ngOnInit() {
@@ -40,6 +42,7 @@ export class LoginComponent implements OnInit {
     if (token && identifiant && idRole) {
       this.redirectBasedOnRole(parseInt(idRole));
     }
+    
   }
   
   // Redirection vers la page de réinitialisation du mot de passe
@@ -83,7 +86,7 @@ export class LoginComponent implements OnInit {
       next: (response) => {
         // Succès
         console.log('Login successful:', response);
-        
+        this.loadUserProfile(this.identifiant)
         // Stocker l'identifiant dans le localStorage
         localStorage.setItem('identifiant', this.identifiant);
         
@@ -107,11 +110,22 @@ export class LoginComponent implements OnInit {
       }
     });
   }
-  
+  loadUserProfile(identifiant: string) {
+    console.log('identifiant',identifiant)
+    console.log('Tentative de chargement du profil pour:', identifiant);
+    this.profileService.getUserProfile(identifiant).subscribe({
+      next: (data) => {
+        console.log('Profil chargé avec succès:', data);
+        sessionStorage.setItem("user",JSON.stringify(data))
+        this.user = JSON.parse(sessionStorage.getItem("user") || '{}');
+      },
+    });
+  }
   // Méthode pour rediriger en fonction du rôle
   private redirectBasedOnRole(role: number) {
-    console.log("Redirection basée sur le rôle:", role);
-    
+    console.log('redirect test')
+    setTimeout(() => {
+      console.log('redirect by role')
     switch(role) {
       case this.ROLE_ADMIN:
         this.router.navigateByUrl('profilA');
@@ -123,5 +137,6 @@ export class LoginComponent implements OnInit {
       default:
         
     }
+  }, 500);
   }
 }

@@ -17,7 +17,7 @@ export class UserListComponent implements OnInit {
   users: User[] = [];
   filteredUsers: User[] = [];
   searchQuery: string = '';
-  public user = JSON.parse(sessionStorage.getItem("user") || '{}');
+  public user = localStorage.getItem("identifiant") || '{}';
   showUserModal: boolean = false;
   editMode: boolean = false;
   currentUser: User = {
