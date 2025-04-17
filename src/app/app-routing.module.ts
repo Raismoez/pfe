@@ -12,6 +12,7 @@ import { NotificationComponent } from './notification/notification.component';
 import { OffreDetailComponent } from './offre-detail/offre-detail.component';
 import { OffreListComponent } from './offre-list/offre-list.component';
 import { CatalogueComponent } from './catalogue/catalogue.component';
+import { OffreFormComponent } from './offre-form/offre-form.component';
 
 
 const routes: Routes = [
@@ -27,6 +28,7 @@ const routes: Routes = [
   { path: 'catalogue', component: CatalogueComponent},
   { path: 'offredetail', component: OffreDetailComponent},
   { path: 'offrelist', component: OffreListComponent},
+  { path: 'offreform', component: OffreFormComponent},
 
 ];
 

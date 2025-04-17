@@ -1,16 +1,28 @@
 <app-sidebar></app-sidebar>
-
 <main class="main-content">
   <app-header></app-header>
-  
+
   <div class="offer-container">
     <div class="offer-header">
       <h1>Nos Offres</h1>
       <p class="subtitle">Des solutions adaptées à vos besoins professionnels</p>
+      
+      <div class="page-header">
+        <div class="search-bar">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Rechercher une offre..." 
+                 [(ngModel)]="searchQuery" 
+                 name="searchQuery"
+                 (input)="onSearch()">
+        </div>
+        <button class="btn primary" (click)="openAddOfferModal()">
+          <i class="fas fa-plus-circle"></i> Ajouter une offre
+        </button>
+      </div>
     </div>
     
     <div class="offer-grid">
-      <div *ngFor="let offer of offers" class="offer-card" [routerLink]="['/offer', offer.id]">
+      <div *ngFor="let offer of filteredOffers" class="offer-card">
        
         
         <div class="card-img-container">
@@ -23,15 +35,10 @@
           <p>{{ offer.description }}</p>
           
           <div class="offer-features">
-            <div class="feature">
+            <div class="feature" *ngFor="let feature of offer.details.features.slice(0, 2)">
               <i class="fas fa-check-circle"></i>
-              <span>Installation rapide</span>
+              <span>{{ feature }}</span>
             </div>
-            <div class="feature">
-              <i class="fas fa-headset"></i>
-              <span>Support 24/7</span>
-            </div>
-            
           </div>
           
           <div class="card-actions">
@@ -39,9 +46,131 @@
               <span>Découvrir</span>
               <i class="fas fa-arrow-right"></i>
             </button>
+            
+            <div class="admin-actions">
+              <button class="btn icon-btn" (click)="editOffer(offer, $event)">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn icon-btn danger" (click)="confirmDelete(offer, $event)">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
           </div>
         </div>
+      </div>
+      
+      <div *ngIf="filteredOffers.length === 0" class="no-offers">
+        <p>Aucune offre trouvée.</p>
       </div>
     </div>
   </div>
 </main>
+
+<!-- Modal offre -->
+<div class="modal" *ngIf="showOfferModal">
+  <div class="modal-content">
+    <h2>{{ editMode ? 'Modifier' : 'Ajouter' }} une offre</h2>
+    <form (ngSubmit)="onSubmitOfferForm()">
+      <div class="info-group">
+        <label>Titre</label>
+        <input 
+          type="text" 
+          [(ngModel)]="currentOffer.title" 
+          name="title" 
+          required 
+          #titleInput="ngModel"
+          [ngClass]="{ 'invalid': titleInput.invalid && titleInput.touched }"
+        />
+        <div *ngIf="titleInput.invalid && titleInput.touched" class="alert">
+          Le titre est requis.
+        </div>
+      </div>
+
+      <div class="info-group">
+        <label>Description</label>
+        <textarea 
+          [(ngModel)]="currentOffer.description" 
+          name="description" 
+          required
+          #descInput="ngModel"
+          [ngClass]="{ 'invalid': descInput.invalid && descInput.touched }"
+          rows="4"
+        ></textarea>
+        <div *ngIf="descInput.invalid && descInput.touched" class="alert">
+          La description est requise.
+        </div>
+      </div>
+
+      <div class="info-group">
+        <label>URL de l'image</label>
+        <input 
+          type="text" 
+          [(ngModel)]="currentOffer.imageUrl" 
+          name="imageUrl" 
+          required
+          #imageInput="ngModel"
+          [ngClass]="{ 'invalid': imageInput.invalid && imageInput.touched }"
+        />
+        <div *ngIf="imageInput.invalid && imageInput.touched" class="alert">
+          L'URL de l'image est requise.
+        </div>
+      </div>
+
+      <div class="info-group">
+        <label>Description détaillée</label>
+        <textarea 
+          [(ngModel)]="currentOffer.details.description" 
+          name="detailsDescription" 
+          required
+          rows="4"
+        ></textarea>
+      </div>
+
+      <div class="info-group">
+        <label>Caractéristiques (séparées par des points-virgules)</label>
+        <textarea 
+          [(ngModel)]="featuresInput" 
+          name="features"
+          rows="4"
+        ></textarea>
+      </div>
+
+      <div class="info-group">
+        <label>Objectifs (séparés par des points-virgules)</label>
+        <textarea 
+          [(ngModel)]="objectivesInput" 
+          name="objectives"
+          rows="4"
+        ></textarea>
+      </div>
+
+      <div class="info-group">
+        <label>Prix</label>
+        <input 
+          type="text" 
+          [(ngModel)]="currentOffer.details.price" 
+          name="price"
+        />
+      </div>
+
+      <div class="modal-buttons">
+        <button type="submit" class="btn primary" [disabled]="titleInput.invalid || descInput.invalid || imageInput.invalid">
+          {{ editMode ? 'Enregistrer' : 'Ajouter' }}
+        </button>
+        <button type="button" class="btn secondary" (click)="closeOfferModal()">Annuler</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal de confirmation de suppression - Style mis à jour -->
+<div class="modal delete-modal" *ngIf="showDeleteConfirmation">
+  <div class="modal-content">
+    <h3>Confirmation de suppression</h3>
+    <p>Êtes-vous sûr de vouloir supprimer l'offre <strong>{{ offerToDelete?.title }}</strong> ?</p>
+    <div class="modal-buttons">
+      <button class="btn primary" (click)="deleteOfferConfirmed()">OK</button>
+      <button class="btn secondary" (click)="cancelDelete()">Annuler</button>
+    </div>
+  </div>
+</div>

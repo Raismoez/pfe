@@ -1,44 +1,39 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { SidebarComponent } from "../components/sidebar/sidebar.component";
-import { HeaderComponent } from "../components/header/header.component";
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 export interface Offer {
   id: number;
   title: string;
   description: string;
   imageUrl: string;
+  popular?: boolean;
+  hasPromo?: boolean;
   details: {
     objectives: string[];
     description: string;
-    pricing: {
+    features: string[];
+    price?: string;
+    pricing?: {
       paymentOptions: string[];
     };
-    subscription: {
+    subscription?: {
       channels: string[];
     };
   };
 }
 
-@Component({
-  selector: 'app-offer-detail',
-  standalone: true,
-  imports: [RouterLink, CommonModule, SidebarComponent, HeaderComponent],
-  templateUrl: './offre-detail.component.html',
-  styleUrls: ['./offre-detail.component.css']
+@Injectable({
+  providedIn: 'root'
 })
-export class OffreDetailComponent implements OnInit {
-  offer?: Offer;
-  loading: boolean = true;
-  error: boolean = false;
-  
-  private offers: Offer[] = [
+export class OfferService {
+  private offersSubject = new BehaviorSubject<Offer[]>([
     {
       id: 1,
       title: 'FAST LINK Guichet Unique',
       description: 'Service Internet très haut débit avec une connexion stable et garantie',
-      imageUrl: 'https://topnet.tn/u_p_l_d/offres/smart-lik_15_0252452001717495224665ee5b83da73.png',
+      imageUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=1200',
+      popular: true,
+      hasPromo: true,
       details: {
         objectives: [
           'Offrir aux clients une connexion très haut débit stable et garantie à des tarifs attractifs',
@@ -46,6 +41,13 @@ export class OffreDetailComponent implements OnInit {
           'Contrecarrer les offres de la concurrence avec des avantages exclusifs'
         ],
         description: 'La relance de l\'offre Fast Link consiste à proposer une tarification avantageuse pour les nouveaux clients uniquement pour les accès FO Internet avec des débits supérieurs ou égal à 30M. Notre engagement est de fournir une connexion stable et performante pour répondre à tous vos besoins numériques.',
+        features: [
+          'Débit jusqu\'à 100 Mbps symétrique',
+          'Installation rapide sous 48h',
+          'Support technique dédié 24/7',
+          'Garantie de service (SLA)'
+        ],
+        price: 'À partir de 79€/mois',
         pricing: {
           paymentOptions: [
             'Paiement échelonné sur 12 mois ou 24 mois ou 36 mois',
@@ -65,7 +67,8 @@ export class OffreDetailComponent implements OnInit {
       id: 2,
       title: 'Rapido PRO',
       description: 'Solution professionnelle haute performance jusqu\'à 100 Mbps',
-      imageUrl: 'https://www.topnet.tn/u_p_l_d/offres/smart-rapido-pro_86_0710448001699976624655395b0ad77b.png',
+      imageUrl: 'https://eshop.tunisietelecom.tn/entreprise/211-home_default/rapido-pro.jpg',
+      hasPromo: false,
       details: {
         objectives: [
           'Fournir une connexion professionnelle stable et ultra-rapide',
@@ -73,6 +76,13 @@ export class OffreDetailComponent implements OnInit {
           'Offrir des solutions personnalisées pour chaque entreprise'
         ],
         description: 'Service Internet professionnel haute performance avec garantie de service et support prioritaire. Rapido PRO est conçu pour les entreprises exigeantes qui nécessitent une connexion fiable et rapide pour leurs activités quotidiennes.',
+        features: [
+          'Débit garanti jusqu\'à 100 Mbps',
+          'Adresse IP fixe incluse',
+          'Support premium avec temps de réponse garanti',
+          'Options de sécurité avancées'
+        ],
+        price: 'À partir de 129€/mois',
         pricing: {
           paymentOptions: [
             'Paiement échelonné sur 12 mois ou 24 mois ou 36 mois',
@@ -93,6 +103,8 @@ export class OffreDetailComponent implements OnInit {
       title: 'VSAT Enterprise',
       description: 'Connectivité satellite pour les zones reculées',
       imageUrl: 'https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?auto=format&fit=crop&q=80&w=1200',
+      popular: false,
+      hasPromo: true,
       details: {
         objectives: [
           'Assurer une couverture Internet dans les zones non desservies',
@@ -100,6 +112,13 @@ export class OffreDetailComponent implements OnInit {
           'Garantir une connexion stable peu importe la localisation'
         ],
         description: 'Solution de connectivité par satellite idéale pour les entreprises situées dans des zones non couvertes par la fibre optique. VSAT Enterprise garantit une connexion stable et performante partout en Tunisie.',
+        features: [
+          'Couverture nationale garantie',
+          'Installation professionnelle incluse',
+          'Idéal pour les sites isolés',
+          'Solution de secours fiable'
+        ],
+        price: 'À partir de 199€/mois',
         pricing: {
           paymentOptions: [
             'Paiement échelonné sur 12 mois ou 24 mois ou 36 mois',
@@ -115,56 +134,47 @@ export class OffreDetailComponent implements OnInit {
         }
       }
     }
-  ];
+  ]);
 
-  constructor(private route: ActivatedRoute) {}
+  offers$ = this.offersSubject.asObservable();
 
-  ngOnInit() {
-    // Simulate loading delay for better UX
-    setTimeout(() => {
-      this.loadOfferData();
-      this.loading = false;
-    }, 500);
+  constructor() { }
+
+  getOffers(): Observable<Offer[]> {
+    return this.offers$;
   }
 
-  private loadOfferData() {
-    try {
-      // Get ID from route parameters
-      const idParam = this.route.snapshot.paramMap.get('id');
-      
-      if (idParam) {
-        const id = Number(idParam);
-        this.offer = this.getOfferById(id);
-        
-        if (!this.offer) {
-          console.warn(`Offer with ID ${id} not found`);
-          this.handleMissingOffer();
-        }
-      } else {
-        console.error('No ID parameter found in route');
-        this.handleMissingOffer();
-      }
-    } catch (error) {
-      console.error('Error loading offer data:', error);
-      this.error = true;
+  getOfferById(id: number): Offer | undefined {
+    return this.offersSubject.value.find(offer => offer.id === id);
+  }
+
+  addOffer(offer: Omit<Offer, 'id'>): void {
+    const currentOffers = this.offersSubject.value;
+    const newId = currentOffers.length > 0 
+      ? Math.max(...currentOffers.map(o => o.id)) + 1 
+      : 1;
+    
+    const newOffer: Offer = {
+      ...offer,
+      id: newId
+    };
+    
+    this.offersSubject.next([...currentOffers, newOffer]);
+  }
+
+  updateOffer(updatedOffer: Offer): void {
+    const currentOffers = this.offersSubject.value;
+    const index = currentOffers.findIndex(offer => offer.id === updatedOffer.id);
+    
+    if (index !== -1) {
+      const newOffers = [...currentOffers];
+      newOffers[index] = updatedOffer;
+      this.offersSubject.next(newOffers);
     }
   }
 
-  private handleMissingOffer() {
-    // Fallback to first offer if available
-    if (this.offers.length > 0) {
-      this.offer = this.offers[0];
-    } else {
-      this.error = true;
-    }
-  }
-
-  private getOfferById(id: number): Offer | undefined {
-    return this.offers.find(offer => offer.id === id);
-  }
-  
-  requestInfo() {
-    // Implement contact functionality here
-    alert('Demande d\'information envoyée. Notre équipe vous contactera prochainement.');
+  deleteOffer(id: number): void {
+    const currentOffers = this.offersSubject.value;
+    this.offersSubject.next(currentOffers.filter(offer => offer.id !== id));
   }
 }
