@@ -42,7 +42,7 @@
           </div>
           
           <div class="card-actions">
-            <button [routerLink]="['/offredetail']" class="btn-primary">
+            <button [routerLink]="['/offredetail', offer.id]" class="btn-primary">
               <span>Découvrir</span>
               <i class="fas fa-arrow-right"></i>
             </button>
@@ -62,6 +62,12 @@
       <div *ngIf="filteredOffers.length === 0" class="no-offers">
         <p>Aucune offre trouvée.</p>
       </div>
+    </div>
+    <div class="action-buttons">
+      <a routerLink="/catalogue" class="btn back-btn">
+        <i class="bi bi-arrow-left "></i> Retour aux catalogue des offres
+      </a>
+      
     </div>
   </div>
 </main>

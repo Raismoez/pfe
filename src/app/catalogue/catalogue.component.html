@@ -60,7 +60,8 @@
             <div class="offer-content">
               <h3>{{ offer.title }}</h3>
               <p>{{ offer.description }}</p>
-              <a [routerLink]="['/offredetail']" class="btn-secondary">En savoir plus</a>
+              <a [routerLink]="['/offredetail', offer.id]" class="btn-secondary">En savoir plus</a>
+
             </div>
           </div>
         </div>

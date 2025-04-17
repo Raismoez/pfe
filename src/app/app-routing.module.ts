@@ -26,7 +26,7 @@ const routes: Routes = [
   { path: 'tableau', component: TableauComponent },
   { path: 'notification', component: NotificationComponent},
   { path: 'catalogue', component: CatalogueComponent},
-  { path: 'offredetail', component: OffreDetailComponent},
+  { path: 'offredetail/:id', component: OffreDetailComponent },
   { path: 'offrelist', component: OffreListComponent},
   { path: 'offreform', component: OffreFormComponent},
 

@@ -518,6 +518,8 @@
 .modal-content {
   background: white;
   padding: 2rem;
+  max-height: 90vh; /* Limite la hauteur du modal */
+  overflow-y: auto;
   border-radius: 8px;
   width: 90%;
   max-width: 500px;

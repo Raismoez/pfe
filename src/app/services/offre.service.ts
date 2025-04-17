@@ -31,7 +31,7 @@ export class OfferService {
       id: 1,
       title: 'FAST LINK Guichet Unique',
       description: 'Service Internet très haut débit avec une connexion stable et garantie',
-      imageUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=1200',
+      imageUrl: 'https://topnet.tn/u_p_l_d/offres/smart-lik_15_0252452001717495224665ee5b83da73.png',
       popular: true,
       hasPromo: true,
       details: {
@@ -51,7 +51,8 @@ export class OfferService {
         pricing: {
           paymentOptions: [
             'Paiement échelonné sur 12 mois ou 24 mois ou 36 mois',
-            'Paiement au comptant'
+            'Paiement au comptant',
+            'À partir de 79€/mois'
           ]
         },
         subscription: {
@@ -67,7 +68,7 @@ export class OfferService {
       id: 2,
       title: 'Rapido PRO',
       description: 'Solution professionnelle haute performance jusqu\'à 100 Mbps',
-      imageUrl: 'https://eshop.tunisietelecom.tn/entreprise/211-home_default/rapido-pro.jpg',
+      imageUrl: 'https://www.topnet.tn/u_p_l_d/offres/smart-rapido-pro_86_0710448001699976624655395b0ad77b.png',
       hasPromo: false,
       details: {
         objectives: [
