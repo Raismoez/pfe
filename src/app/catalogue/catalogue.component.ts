@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { SidebarComponent } from "../components/sidebar/sidebar.component";
 import { HeaderComponent } from "../components/header/header.component";
 import { trigger, transition, style, animate } from '@angular/animations';
+import { ReservationComponent } from '../reservation/reservation.component';
 
 export interface Offer {
   id: number;
@@ -20,7 +21,7 @@ export interface Offer {
 @Component({
   selector: 'app-catalogue',
   standalone: true,
-  imports: [RouterLink, CommonModule, SidebarComponent, HeaderComponent],
+  imports: [RouterLink, CommonModule, SidebarComponent, HeaderComponent,ReservationComponent],
   templateUrl: './catalogue.component.html',
   styleUrls: ['./catalogue.component.css'],
   animations: [

@@ -13,10 +13,12 @@ import { NotificationComponent } from './notification/notification.component';
 import { CatalogueComponent } from './catalogue/catalogue.component';
 import { OffreDetailComponent } from './offre-detail/offre-detail.component';
 import { OffreListComponent } from './offre-list/offre-list.component';
+import { ReservationComponent } from './reservation/reservation.component';
 
 @NgModule({
   declarations: [
     AppComponent,
+  
     
     
     
