@@ -13,11 +13,9 @@ import { NotificationComponent } from './notification/notification.component';
 import { CatalogueComponent } from './catalogue/catalogue.component';
 import { OffreDetailComponent } from './offre-detail/offre-detail.component';
 import { OffreListComponent } from './offre-list/offre-list.component';
-<<<<<<< HEAD
+
 import { ReservationComponent } from './reservation/reservation.component';
-=======
 import { OffreFormComponent } from './offre-form/offre-form.component';
->>>>>>> 1240c05d46691d404be68e3b2719a1558a91b5f0
 
 @NgModule({
   declarations: [

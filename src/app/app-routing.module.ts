@@ -12,11 +12,11 @@ import { NotificationComponent } from './notification/notification.component';
 import { OffreDetailComponent } from './offre-detail/offre-detail.component';
 import { OffreListComponent } from './offre-list/offre-list.component';
 import { CatalogueComponent } from './catalogue/catalogue.component';
-<<<<<<< HEAD
+
 import { ReservationComponent } from './reservation/reservation.component';
-=======
+
 import { OffreFormComponent } from './offre-form/offre-form.component';
->>>>>>> 1240c05d46691d404be68e3b2719a1558a91b5f0
+
 
 
 const routes: Routes = [
@@ -32,11 +32,9 @@ const routes: Routes = [
   { path: 'catalogue', component: CatalogueComponent},
   { path: 'offredetail/:id', component: OffreDetailComponent },
   { path: 'offrelist', component: OffreListComponent},
-<<<<<<< HEAD
   { path: 'reservation', component: ReservationComponent},
-=======
-  { path: 'offreform', component: OffreFormComponent},
->>>>>>> 1240c05d46691d404be68e3b2719a1558a91b5f0
+
+
 
 ];
 
