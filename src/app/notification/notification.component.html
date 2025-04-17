@@ -1,0 +1,98 @@
+<!-- Bouton pour ouvrir le modal de notification -->
+<button class="btn-add" (click)="openNotificationModal()">
+    <i class="fas fa-bell"></i>
+    Notification
+  </button>
+  
+  <!-- Modal de notification -->
+  <div class="modal notification-modal" *ngIf="showNotificationModal">
+    <div class="modal-content">
+      <h2>Configurer les Notifications</h2>
+      <form (ngSubmit)="sendNotification()">
+        <div class="info-group">
+          <label>Destinataires (séparés par des virgules)</label>
+          <input 
+            type="text" 
+            [(ngModel)]="notificationSettings.recipients" 
+            name="recipients" 
+            placeholder="exemple@email.com, autre@email.com" 
+            required 
+            #recipientsInput="ngModel"
+            [ngClass]="{ 'invalid': recipientsInput.invalid && recipientsInput.touched }"
+          >
+          <div *ngIf="recipientsInput.invalid && recipientsInput.touched" class="alert">
+            Au moins un destinataire est requis.
+          </div>
+        </div>
+  
+        <div class="info-group">
+          <label>Sujet</label>
+          <input 
+            type="text" 
+            [(ngModel)]="notificationSettings.subject" 
+            name="subject" 
+            placeholder="Rapport de stock" 
+            required
+            #subjectInput="ngModel"
+            [ngClass]="{ 'invalid': subjectInput.invalid && subjectInput.touched }"
+          >
+          <div *ngIf="subjectInput.invalid && subjectInput.touched" class="alert">
+            Le sujet est requis.
+          </div>
+        </div>
+  
+        <div class="notification-options">
+          <div class="notification-option">
+            <input type="checkbox" id="sendNow" [(ngModel)]="notificationSettings.sendNow" name="sendNow">
+            <label for="sendNow">Envoyer maintenant</label>
+          </div>
+  
+          <div class="notification-option" *ngIf="!notificationSettings.sendNow">
+            <div class="info-group">
+              <label>Heure d'envoi programmé</label>
+              <input 
+                type="datetime-local" 
+                [(ngModel)]="notificationSettings.scheduleTime" 
+                name="scheduleTime" 
+                [required]="!notificationSettings.sendNow"
+                #scheduleInput="ngModel"
+                [ngClass]="{ 'invalid': scheduleInput.invalid && scheduleInput.touched && !notificationSettings.sendNow }"
+              >
+              <div *ngIf="scheduleInput.invalid && scheduleInput.touched && !notificationSettings.sendNow" class="alert">
+                L'heure d'envoi est requise.
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <div class="notification-types">
+          <h3>Types de Notifications</h3>
+          <div class="notification-type-grid">
+            <div class="notification-type">
+              <input type="checkbox" id="outOfStock" [(ngModel)]="notificationSettings.notificationTypes.outOfStock" name="outOfStock">
+              <label for="outOfStock">Articles en rupture</label>
+            </div>
+            <div class="notification-type">
+              <input type="checkbox" id="lowStock" [(ngModel)]="notificationSettings.notificationTypes.lowStock" name="lowStock">
+              <label for="lowStock">Stock faible</label>
+            </div>
+            <div class="notification-type">
+              <input type="checkbox" id="endOfSale" [(ngModel)]="notificationSettings.notificationTypes.endOfSale" name="endOfSale">
+              <label for="endOfSale">End of Sale</label>
+            </div>
+            <div class="notification-type">
+              <input type="checkbox" id="endOfSupport" [(ngModel)]="notificationSettings.notificationTypes.endOfSupport" name="endOfSupport">
+              <label for="endOfSupport">End of Support</label>
+            </div>
+          </div>
+        </div>
+  
+        <div class="modal-buttons">
+          <button type="submit" class="btn primary" [disabled]="!isNotificationFormValid()">
+            {{ notificationSettings.sendNow ? 'Envoyer' : 'Programmer' }}
+          </button>
+          <button type="button" class="btn secondary" (click)="closeNotificationModal()">Annuler</button>
+        </div>
+      </form>
+    </div>
+  </div>

@@ -1,0 +1,106 @@
+<!-- Main layout structure -->
+<app-sidebar></app-sidebar>
+
+<main class="main-content">
+  <app-header></app-header>
+  
+  <!-- Loading state -->
+  <div class="loading-container" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Chargement en cours...</p>
+  </div>
+  
+  <!-- Error state -->
+  <div class="error-container" *ngIf="error">
+    <i class="bi bi-exclamation-triangle"></i>
+    <h2>Une erreur s'est produite</h2>
+    <p>Impossible de charger les détails de l'offre. Veuillez réessayer plus tard.</p>
+    <a routerLink="/offrelist" class="btn back-btn">Retour aux offres</a>
+  </div>
+
+  <div class="offer-detail-container" *ngIf="offer && !loading && !error">
+    <!-- Hero section with image and title -->
+    <div class="offer-hero">
+      <div class="image-container">
+        <img [src]="offer.imageUrl" [alt]="offer.title" class="hero-image">
+        <div class="overlay"></div>
+      </div>
+      <div class="hero-content">
+        <h1 class="offer-title">{{ offer.title }}</h1>
+        <p class="offer-subtitle">{{ offer.description }}</p>
+      </div>
+    </div>
+    
+    <!-- Content sections with card-based layout -->
+    <div class="content-cards">
+      <!-- Objectives card -->
+      <div class="card objectives-card">
+        <div class="card-header">
+          <i class="bi bi-bullseye"></i>
+          <h3>Objectifs</h3>
+        </div>
+        <div class="card-body">
+          <ul class="objectives-list">
+            <li *ngFor="let objective of offer.details.objectives" class="objective-item">
+              <i class="bi bi-check-circle"></i>
+              <span>{{ objective }}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      
+      <!-- Description card -->
+      <div class="card description-card">
+        <div class="card-header">
+          <i class="bi bi-info-circle"></i>
+          <h3>Description</h3>
+        </div>
+        <div class="card-body">
+          <p class="description-text">{{ offer.details.description }}</p>
+        </div>
+      </div>
+      
+      <!-- Pricing card -->
+      <div class="card pricing-card">
+        <div class="card-header">
+          <i class="bi bi-currency-exchange"></i>
+          <h3>TARIFICATION</h3>
+        </div>
+        <div class="card-body">
+          <p class="pricing-text">L'offre est proposée selon deux modes de paiement :</p>
+          <ul class="pricing-options">
+            <li *ngFor="let option of offer.details.pricing.paymentOptions" class="pricing-item">
+              <i class="bi bi-check-circle"></i>
+              <span>{{ option }}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Subscription card -->
+      <div class="card subscription-card">
+        <div class="card-header">
+          <i class="bi bi-journal-text"></i>
+          <h3>COMMENT S'Y ABONNER ?</h3>
+        </div>
+        <div class="card-body">
+          <p class="subscription-text">La souscription à l'offre {{ offer.title }} se fait à travers :</p>
+          <ul class="subscription-channels">
+            <li *ngFor="let channel of offer.details.subscription.channels" class="subscription-item">
+              <i class="bi bi-check-circle"></i>
+              <span>{{ channel }}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Action buttons -->
+    <div class="action-buttons">
+      <a routerLink="/offrelist" class="btn back-btn">
+        <i class="bi bi-arrow-left"></i> Retour aux offres
+      </a>
+      
+    </div>
+  </div>
+</main>

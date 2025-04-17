@@ -1,0 +1,47 @@
+<app-sidebar></app-sidebar>
+
+<main class="main-content">
+  <app-header></app-header>
+  
+  <div class="offer-container">
+    <div class="offer-header">
+      <h1>Nos Offres</h1>
+      <p class="subtitle">Des solutions adaptées à vos besoins professionnels</p>
+    </div>
+    
+    <div class="offer-grid">
+      <div *ngFor="let offer of offers" class="offer-card" [routerLink]="['/offer', offer.id]">
+       
+        
+        <div class="card-img-container">
+          <img [src]="offer.imageUrl" [alt]="offer.title">
+          <div class="overlay"></div>
+        </div>
+        
+        <div class="offer-content">
+          <h3>{{ offer.title }}</h3>
+          <p>{{ offer.description }}</p>
+          
+          <div class="offer-features">
+            <div class="feature">
+              <i class="fas fa-check-circle"></i>
+              <span>Installation rapide</span>
+            </div>
+            <div class="feature">
+              <i class="fas fa-headset"></i>
+              <span>Support 24/7</span>
+            </div>
+            
+          </div>
+          
+          <div class="card-actions">
+            <button [routerLink]="['/offredetail']" class="btn-primary">
+              <span>Découvrir</span>
+              <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>

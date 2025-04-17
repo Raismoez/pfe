@@ -1,0 +1,259 @@
+/* Variables */
+:root {
+    --primary-color: #4154f1;
+    --primary-light: #e0e5ff;
+    --primary-dark: #2a3bba;
+    --secondary-color: #6c757d;
+    --success-color: #00c875;
+    --light-bg: #f8f9fa;
+    --text-color: #2d3748;
+    --text-light: #64748b;
+    --card-shadow: 0 10px 30px rgba(65, 84, 241, 0.15);
+    --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    --border-radius: 18px;
+  }
+  
+  /* Main Layout */
+  .main-content {
+    flex: 1;
+    margin-left: 250px;
+    padding: 30px;
+    background-color: #f9faff;
+  }
+  
+  /* Offer Container */
+  .offer-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  
+  /* Header Section */
+  .offer-header {
+    text-align: center;
+    margin-bottom: 3.5rem;
+    position: relative;
+  }
+  
+  .offer-header h1 {
+    color: #4154f1;
+    font-size: 2.75rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    position: relative;
+    display: inline-block;
+  }
+  
+  .offer-header h1::after {
+    content: '';
+    position: absolute;
+    width: 80px;
+    height: 4px;
+    background-color: #2563eb;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 10px;
+  }
+  
+  .subtitle {
+    color: #2563eb;
+    font-size: 1.2rem;
+    margin-top: 1.5rem;
+    font-weight: 400;
+  }
+  
+  /* Card Grid */
+  .offer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2.5rem;
+  }
+  
+  /* Card Design */
+  .offer-card {
+    background: white;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+    border: 1px solid rgba(0, 0, 0, 0.03);
+  }
+  
+  .offer-card:hover {
+    transform: translateY(0px);
+    box-shadow: 0 15px 35px rgba(0, 25, 253, 0.41);
+  }
+  
+  .badge {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: var(--success-color);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    z-index: 10;
+    box-shadow: 0 4px 10px rgba(0, 200, 117, 0.3);
+  }
+  
+  .card-img-container {
+    position: relative;
+    overflow: hidden;
+    height: 220px;
+  }
+  
+  .offer-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    
+  }
+  
+
+
+  
+  .offer-card:hover .overlay {
+    opacity: 1;
+  }
+  
+  .offer-content {
+    padding: 2rem;
+  }
+  
+  .offer-card h3 {
+    color: var(--primary-color);
+    margin: 0 0 1rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    transition: var(--transition);
+  }
+  
+  .offer-card:hover h3 {
+    color: var(--primary-dark);
+  }
+  
+  .offer-card p {
+    color: var(--text-light);
+    line-height: 1.7;
+    margin: 0 0 1.5rem;
+    font-size: 1rem;
+  }
+  
+  /* Features */
+  .offer-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 1.8rem;
+  }
+  
+  .feature {
+    display: flex;
+    align-items: center;
+    margin-right: 15px;
+    font-size: 0.9rem;
+    color: var(--text-light);
+    transition: var(--transition);
+  }
+  
+  .feature i {
+    color: var(--primary-color);
+    margin-right: 8px;
+  }
+  
+  .offer-card:hover .feature {
+    color: var(--text-color);
+  }
+  
+ 
+  
+  .btn-primary {
+    padding: 0.75rem 1.5rem;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    text-align: center;
+    background-color: #4154f1;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+  }
+  
+  .btn-primary:hover {
+    background-color: #2563eb;
+    box-shadow: 0 6px 15px rgba(65, 84, 241, 0.25);
+  }
+  
+  .btn-primary i {
+    transition: var(--transition);
+  }
+  
+  .btn-primary:hover i {
+    transform: translateX(4px);
+  }
+  
+  /* Responsive */
+  @media (max-width: 1200px) {
+    .main-content {
+      margin-left: 220px;
+    }
+  }
+  
+  @media (max-width: 1024px) {
+    .main-content {
+      margin-left: 0;
+      padding: 20px;
+    }
+    
+    .offer-grid {
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+    
+    .offer-header h1 {
+      font-size: 2.3rem;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .offer-container {
+      padding: 1.5rem;
+    }
+    
+    .offer-header h1 {
+      font-size: 2rem;
+    }
+    
+    .offer-header h1::after {
+      width: 60px;
+    }
+    
+    .subtitle {
+      font-size: 1.1rem;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .offer-container {
+      padding: 1rem;
+    }
+    
+    .offer-grid {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    
+    .offer-content {
+      padding: 1.5rem;
+    }
+  }

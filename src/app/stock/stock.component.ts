@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { StockService } from '../Service/stock.service';
+import { StockService } from '../services/stock.service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { SidebarComponent } from '../components/sidebar/sidebar.component';
 import { HeaderComponent } from '../components/header/header.component';
+import { NotificationComponent } from '../notification/notification.component';
+
 
 export interface Stock {
   id: number;
@@ -21,13 +23,14 @@ export interface Stock {
 @Component({
   selector: 'app-stock',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule, SidebarComponent, HeaderComponent],
+  imports: [CommonModule, FormsModule, HttpClientModule, SidebarComponent, HeaderComponent, NotificationComponent],
   templateUrl: './stock.component.html',
   styleUrl: './stock.component.css'
 })
 export class StockComponent implements OnInit {
   stocks: Stock[] = [];
   filteredStocks: Stock[] = [];
+  displayedStocks: Stock[] = []; // Stocks affichés sur la page courante
   searchQuery: string = '';
   showStockModal: boolean = false;
   editMode: boolean = false;
@@ -39,7 +42,15 @@ export class StockComponent implements OnInit {
   showDeleteConfirmation: boolean = false;
   stockToDelete: Stock | null = null;
   
-  constructor(private router: Router, private stockService: StockService) {
+  // Propriétés de pagination
+  currentPage: number = 1;
+  itemsPerPage: number = 8;
+  totalPages: number = 1;
+  
+  constructor(
+    private router: Router, 
+    private stockService: StockService
+  ) {
     this.showStockModal = false;
     this.showDeleteConfirmation = false;
   }
@@ -72,6 +83,7 @@ export class StockComponent implements OnInit {
       return new Date(stock.endOfSupport) <= today;
     }).length;
   }
+  
   getEndOfSaleCount(): number {
     const today = new Date();
     return this.stocks.filter(stock => {
@@ -84,7 +96,8 @@ export class StockComponent implements OnInit {
     this.stockService.getAllStocks().subscribe({
       next: (data) => {
         this.stocks = data;
-        this.applyFilters();
+        this.filteredStocks = [...data];
+        this.updatePagination();
       },
       error: (error) => {
         console.error('Erreur lors du chargement des stocks', error);
@@ -93,40 +106,76 @@ export class StockComponent implements OnInit {
   }
 
   applyFilters() {
-  let filtered = [...this.stocks];
-  console.log(filtered);
+    let filtered = [...this.stocks];
 
-  // Apply search filter
-  if (this.searchQuery.trim()) {
-    const query = this.searchQuery.toLowerCase();
-    filtered = filtered.filter(stock =>
-      stock.categorie.toLowerCase().includes(query)
-    );
+    // Appliquer le filtre de recherche
+    if (this.searchQuery.trim()) {
+      const query = this.searchQuery.toLowerCase();
+      filtered = filtered.filter(stock =>
+        stock.article.toLowerCase().includes(query) ||
+        stock.constructeur.toLowerCase().includes(query) ||
+        stock.categorie.toLowerCase().includes(query)
+      );
+    }
+
+    // Appliquer le filtre de catégorie
+    if (this.selectedCategory) {
+      filtered = filtered.filter(stock => stock.categorie.includes(this.selectedCategory));
+    }
+
+    // Appliquer le tri
+    const sortField = this.sortBy.startsWith('-') ? this.sortBy.slice(1) : this.sortBy;
+    const sortDirection = this.sortBy.startsWith('-') ? -1 : 1;
+
+    filtered.sort((a, b) => {
+      if (a[sortField as keyof Stock] < b[sortField as keyof Stock]) return -1 * sortDirection;
+      if (a[sortField as keyof Stock] > b[sortField as keyof Stock]) return 1 * sortDirection;
+      return 0;
+    });
+
+    this.filteredStocks = filtered;
+    
+    // Réinitialiser à la première page après filtrage
+    this.currentPage = 1;
+    this.updatePagination();
   }
 
-  // Vérifier si la catégorie sélectionnée correspond partiellement à des catégories existantes
-  const categoriesExistantes = [...new Set(filtered.map(stock => stock.categorie))];
-
-  if (this.selectedCategory && categoriesExistantes.some(cat => cat.includes(this.selectedCategory))) {
-    filtered = filtered.filter(stock => stock.categorie.includes(this.selectedCategory));
+  // Mettre à jour la pagination
+  updatePagination() {
+    this.totalPages = Math.ceil(this.filteredStocks.length / this.itemsPerPage);
+    if (this.totalPages === 0) this.totalPages = 1;
+    
+    // S'assurer que la page courante est valide
+    if (this.currentPage > this.totalPages) {
+      this.currentPage = this.totalPages;
+    }
+    
+    // Calculer les indices de début et de fin
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = Math.min(startIndex + this.itemsPerPage, this.filteredStocks.length);
+    
+    // Mettre à jour les stocks affichés
+    this.displayedStocks = this.filteredStocks.slice(startIndex, endIndex);
   }
-
-  // Apply sorting
-  const sortField = this.sortBy.startsWith('-') ? this.sortBy.slice(1) : this.sortBy;
-  const sortDirection = this.sortBy.startsWith('-') ? -1 : 1;
-
-  filtered.sort((a, b) => {
-    if (a[sortField as keyof Stock] < b[sortField as keyof Stock]) return -1 * sortDirection;
-    if (a[sortField as keyof Stock] > b[sortField as keyof Stock]) return 1 * sortDirection;
-    return 0;
-  });
-
-  this.filteredStocks = filtered;
-}
-
   
+  // Aller à la page suivante
+  goToNextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePagination();
+    }
+  }
+  
+  // Aller à la page précédente
+  goToPreviousPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePagination();
+    }
+  }
 
   onSearch() {
+    this.currentPage = 1; // Retour à la première page lors d'une nouvelle recherche
     this.applyFilters();
   }
 
@@ -146,7 +195,7 @@ export class StockComponent implements OnInit {
     this.showStockModal = true;
   }
 
-  // Fermer le modal
+  // Fermer le modal de stock
   closeStockModal() {
     console.log('Closing modal');
     this.showStockModal = false;
@@ -164,7 +213,8 @@ export class StockComponent implements OnInit {
       this.stockService.deleteStock(this.stockToDelete.id).subscribe(
         () => {
           this.stocks = this.stocks.filter(s => s.id !== this.stockToDelete?.id);
-          this.filteredStocks = [...this.stocks];
+          this.filteredStocks = this.filteredStocks.filter(s => s.id !== this.stockToDelete?.id);
+          this.updatePagination();
           this.cancelDelete();
         },
         (error) => {
@@ -190,13 +240,12 @@ export class StockComponent implements OnInit {
           const index = this.stocks.findIndex(s => s.id === updatedStock.id);
           if (index !== -1) {
             this.stocks[index] = updatedStock;
-            this.filteredStocks = [...this.stocks];
+            this.applyFilters();
           }
           this.closeStockModal();
         },
         error: (error) => {
           console.error('Erreur lors de la mise à jour', error);
-          // Afficher un message d'erreur à l'utilisateur
           alert("Erreur lors de la mise à jour: " + this.getErrorMessage(error));
         }
       });
@@ -204,12 +253,11 @@ export class StockComponent implements OnInit {
       this.stockService.createStock(this.currentStock).subscribe({
         next: (newStock) => {
           this.stocks.push(newStock);
-          this.filteredStocks = [...this.stocks];
+          this.applyFilters();
           this.closeStockModal();
         },
         error: (error) => {
           console.error("Erreur lors de l'ajout du stock", error);
-          // Afficher un message d'erreur à l'utilisateur
           alert("Erreur lors de l'ajout: " + this.getErrorMessage(error));
         }
       });

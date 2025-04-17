@@ -1,17 +1,15 @@
 <header class="top-header">
-    <div class="row content-header">
-      <div class="col-10">
-        <div class="search-bar">
-          <i class="fas fa-search"></i>
-          <input type="text" placeholder="Rechercher un utilisateur..." >
-        </div>
-      </div>
-      <div class="col-2 bloc-profile">
-        <div class="user-menu">
-          <img routerLink="/profilA" [src]="user.avatarUrl" alt="Avatar" class="profile_image" width="25%" />
-          <span class="user-name">{{ user.nomUtilisateur }}</span>
-        </div>
+  <div class="row content-header">
+    <div class="col-10">
+      <div class="home-icon-container">
+        <i class="fa fa-home home-icon" routerLink="/dashboard"></i>
       </div>
     </div>
-  </header>
-  
+    <div class="col-2 bloc-profile">
+      <div class="user-menu">
+        <img routerLink="/profilA" [src]="user.avatarUrl" alt="Avatar" class="profile_image" width="25%" />
+        <span class="user-name">{{ user.nomUtilisateur }}</span>
+      </div>
+    </div>
+  </div>
+</header>

@@ -5,7 +5,6 @@
 }
 .dashboard-container {
   padding: 2rem;
-  background-color: white;
   min-height: 100vh;
 }
 
@@ -107,21 +106,6 @@
   min-width: 200px;
 }
 
-.btn-add {
-  background: #3b82f6;
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-weight: 500;
-  transition: background-color 0.2s;
-}
-
-.btn-add:hover {
-  background: #2563eb;
-}
 
 /* Stock Grid */
 .stock-grid {
@@ -218,6 +202,18 @@
 
 .low-stock {
   border: 1px solid #ef4444;
+}
+.icone-blue{
+  background-color: rgba(59, 130, 246, 0.1);
+}
+.icone-green{
+  background-color: rgba(16, 185, 129, 0.1);
+}
+.icone-yellow{
+  background-color: rgba(245, 158, 11, 0.1);
+}
+.icone-red{
+  background-color: rgba(239, 68, 68, 0.1);
 }
 
 /* Responsive Design */
@@ -586,5 +582,52 @@
   width: 16px;
   color: #4154f1;
 }
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding: 12px 16px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.page-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #333;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.page-btn:hover:not([disabled]) {
+  background-color: #f1f5f9;
+  border-color: #cbd5e0;
+}
+
+.page-btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-info {
+  font-size: 14px;
+  color: #4a5568;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .pagination {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
 
 

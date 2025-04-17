@@ -1,116 +1,90 @@
 <app-sidebar></app-sidebar>
-
 <main class="main-content">
- <app-header></app-header>
-
-<div class="dashboard-container" [class.dark-theme]="isDarkMode">
-    <div class="dashboard-header">
-      <h1 class="page-title">Tableau de Bord de Stock</h1>
+  <app-header></app-header>
+  <div class="dashboard-header">
+    <h1 class="page-title">Tableau de Bord de Stock</h1>
+    <div class="header-actions">
+      <button class="btn refresh-btn" (click)="refreshDashboard()">
+        <i class="fas fa-sync-alt"></i> Rafraîchir
+      </button>
     </div>
-  
+  </div>
+    
     <div class="summary-grid">
-      <div 
-        class="summary-card" 
-        *ngFor="let card of summaryCards"
-        [ngClass]="{'hover-lift': true}"
-      >
-        <div class="card-icon">
+      <div class="summary-card hover-lift" *ngFor="let card of summaryCards">
+        <div class="card-icon" [ngClass]="card.iconClass">
           <i [class]="card.icon"></i>
         </div>
         <div class="card-content">
           <h3>{{ card.title }}</h3>
-          <p 
-            class="card-value" 
-            [ngClass]="card.valueClass"
-          >
+          <p class="card-value" [ngClass]="card.valueClass">
             {{ card.value }}
           </p>
         </div>
-        <div class="card-trend">
-          <span [ngClass]="card.trendClass">
-            <i class="fas" [ngClass]="card.trendIcon"></i>
-            {{ card.trendPercentage }}%
-          </span>
-        </div>
       </div>
     </div>
-  <div class="row">
-    <div class="col-6">
-      <canvas #manufacturerChart></canvas>
-    </div>
-    <div class="col-6">
-      <canvas #stockEvolutionChart></canvas>
-    </div>
-    <div class="col-6">
-      <canvas #categoryChart></canvas>
-    </div>
-   
 
-  </div>
-    <!-- <div class="charts-section">
-      <div class="chart-grid">
-        <div class="chart-card ">
-          <h2 class="chart-title">Stock par Constructeur</h2>
-          <canvas #manufacturerChart></canvas>
+    <!-- Cisco Articles Charts -->
+    <div class="dashboard-section">
+      <div class="charts-grid">
+        <div class="chart-card">
+          <canvas #C820014TChart></canvas>
         </div>
         <div class="chart-card">
-          <h2 class="chart-title">Distribution des Catégories</h2>
-          <canvas #categoryChart></canvas>
+          <canvas #C83001N1S6TChart></canvas>
         </div>
         <div class="chart-card">
-          <h2 class="chart-title">Évolution du Stock Total</h2>
-          <canvas #stockEvolutionChart></canvas>
+          <canvas #C1121X8PChart></canvas>
+        </div>
+        <div class="chart-card">
+          <canvas #C11174PChart></canvas> 
+        </div>
+        <div class="chart-card">
+          <canvas #C11174PWEChart></canvas>
         </div>
        
       </div>
-    </div> -->
-  
-     <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold">Détails du Stock</h2>
-          <input 
-            type="text" 
-            placeholder="Rechercher..." 
-            (input)="onSearch($event)"
-            class="px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
-          >
+    </div>
+
+    <!-- Fortinet Articles Charts -->
+    <div class="dashboard-section">
+      <div class="charts-grid">
+        <div class="chart-card">
+          <canvas #FortiGate80FChart></canvas>
         </div>
-    
-        <div class="overflow-x-auto">
-          <table class="w-full">
-            <thead class="bg-gray-100 dark:bg-gray-700">
-              <tr>
-                <th class="p-3 text-left">Article</th>
-                <th class="p-3 text-left">Constructeur</th>
-                <th class="p-3 text-left">Catégorie</th>
-                <th class="p-3 text-left">Date</th>
-                <th class="p-3 text-left">Quantité</th>
-                <th class="p-3 text-left">Fin de Vente</th>
-                <th class="p-3 text-left">Fin de Support</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr 
-                *ngFor="let item of filteredStockData" 
-                class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
-              >
-                <td class="p-3">{{ item.article }}</td>
-                <td class="p-3">{{ item.constructeur }}</td>
-                <td class="p-3">{{ item.categorie }}</td>
-                <td class="p-3">{{ item.date }}</td>
-                <td class="p-3" 
-                    [ngClass]="{
-                      'text-red-500': item.quantite < 20,
-                      'text-green-500': item.quantite >= 20
-                    }"
-                >
-                  {{ item.quantite }}
-                </td>
-                <td class="p-3">{{ item.endOfSale }}</td>
-                <td class="p-3">{{ item.endOfSupport }}</td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="chart-card">
+          <canvas #FortiGate80FDSLChart></canvas>
+        </div>
+        <div class="chart-card">
+          <canvas #FortiGate80F2R3G4GDSLChart></canvas>
         </div>
       </div>
     </div>
+
+    <!-- Huawei Articles Charts -->
+    <div class="dashboard-section">
+      <div class="charts-grid">
+        <div class="chart-card">
+          <canvas #AR651Chart></canvas>
+        </div>
+        <div class="chart-card">
+          <canvas #AR617VWLTEChart></canvas>
+        </div>
+        <div class="chart-card">
+          <canvas #AR657WChart></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-7">
+        <canvas #manufacturerChart></canvas>
+      </div>
+      
+      <div class="col-5">
+        <canvas #categoryChart></canvas>
+      </div>
+    </div>
+    <h2 class="text-xl">Détails du Stock</h2>
+    <button class="btn" [routerLink]="['/tableau']">Voir stock</button>
+</main>

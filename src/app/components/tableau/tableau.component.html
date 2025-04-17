@@ -1,0 +1,126 @@
+<app-sidebar></app-sidebar>
+<main class="main-content">
+  <app-header></app-header>
+  <div class="table-container">
+    <!-- Header Section -->
+    <div class="header-section">
+      <div class="title-section">
+        <h2>Détails du Stock</h2>
+      </div>
+      
+      <div class="actions-section">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input
+            type="text"
+            placeholder="Rechercher un article..."
+            (input)="onSearch($event)"
+            class="search-input"
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="table-responsive">
+      <table class="stock-table">
+        <thead>
+          <tr>
+            <th>Article</th>
+            <th>Constructeur</th>
+            <th>Catégorie</th>
+            <th>Date</th>
+            <th>Quantité</th>
+            <th>M2</th>
+            <th>M3</th>
+            <th>M4</th>
+            <th>M5</th>
+            <th>M6</th>
+            <th>Fin de Vente</th>
+            <th>Fin de Support</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of filteredStockData">
+            <td class="item-cell">
+              <div class="item-info">
+                <span class="item-name">{{ item.article }}</span>
+              </div>
+            </td>
+            <td>{{ item.constructeur }}</td>
+            <td>
+              <span class="category-badge">{{ item.categorie }}</span>
+            </td>
+            <td>{{ item.date }}</td>
+            <td>
+              <div class="quantity-cell">
+                <span class="quantity-number">{{ item.quantite }}</span>
+                <div class="quantity-indicator"></div>
+              </div>
+            </td>
+            <td>
+              <div class="month-data">
+                <span class="month-date">{{ item.dateM2 }}</span>
+                <span class="month-quantity">
+                  {{ item.quantiteM2 }}
+                </span>
+              </div>
+            </td>
+            <td>
+              <div class="month-data">
+                <span class="month-date">{{ item.dateM3 }}</span>
+                <span class="month-quantity">
+                  {{ item.quantiteM3 }}
+                </span>
+              </div>
+            </td>
+            <td>
+              <div class="month-data">
+                <span class="month-date">{{ item.dateM4 }}</span>
+                <span class="month-quantity">
+                  {{ item.quantiteM4 }}
+                </span>
+              </div>
+            </td>
+            <td>
+              <div class="month-data">
+                <span class="month-date">{{ item.dateM5 }}</span>
+                <span class="month-quantity">
+                  {{ item.quantiteM5 }}
+                </span>
+              </div>
+            </td>
+            <td>
+              <div class="month-data">
+                <span class="month-date">{{ item.dateM6 }}</span>
+                <span class="month-quantity">
+                  {{ item.quantiteM6 }}
+                </span>
+              </div>
+            </td>
+            <td>
+              <span class="date-badge end-sale">{{ item.endOfSale }}</span>
+            </td>
+            <td>
+              <span class="date-badge end-support">{{ item.endOfSupport }}</span>
+            </td>
+          </tr>
+          <tr *ngIf="filteredStockData.length === 0">
+            <td colspan="12" class="no-data">Aucune donnée disponible</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    
+    <div class="pagination" *ngIf="filteredStockData.length > 0">
+      <button class="page-btn" [disabled]="currentPage === 1" (click)="goToPreviousPage()">
+        ← Précédent
+      </button>
+      <span class="page-info">Page {{ currentPage }} sur {{ totalPages }}</span>
+      <button class="page-btn" [disabled]="currentPage === totalPages" (click)="goToNextPage()">
+        Suivant →
+      </button>
+    </div>
+  </div>
+</main>

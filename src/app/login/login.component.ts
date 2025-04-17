@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { AuthService } from '../Service/auth.service';
-import { ProfileService } from '../Service/profil.service';
+import { AuthService } from '../services/auth.service';
+import { ProfileService } from '../services/profil.service';
 
 @Component({
   selector: 'app-login',
@@ -128,11 +128,11 @@ export class LoginComponent implements OnInit {
       console.log('redirect by role')
     switch(role) {
       case this.ROLE_ADMIN:
-        this.router.navigateByUrl('profilA');
+        this.router.navigateByUrl('dashboard');
         break;
       case this.ROLE_AGENT_COMMERCIAL:
       case this.ROLE_AGENT_TECHNIQUE:
-        this.router.navigateByUrl('profilU');
+        this.router.navigateByUrl('dashboard');
         break;
       default:
         

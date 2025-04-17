@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { ProfileService } from '../Service/profil.service';
+import { ProfileService } from '../services/profil.service';
 import { SidebarComponent } from '../components/sidebar/sidebar.component';
 import { HeaderComponent } from '../components/header/header.component';
 
@@ -74,14 +74,6 @@ export class profilAComponent implements OnInit {
     this.profileService.getUserProfile(identifiant).subscribe({
       next: (data) => {
        
-
-        // Ensure avatar URL is properly formatted
-        // let avatarUrl = data.avatarUrl || '';
-        // // If the URL is not empty and doesn't start with http or data: (for preview)
-        // if (avatarUrl && !avatarUrl.startsWith('http') && !avatarUrl.startsWith('data:')) {
-        //   // Ensure it has the full backend URL prefix
-        //   avatarUrl = `${this.apiBaseUrl}${avatarUrl.startsWith('/') ? '' : '/'}${avatarUrl}`;
-        // }
         
         this.userProfile = {
           ...data,

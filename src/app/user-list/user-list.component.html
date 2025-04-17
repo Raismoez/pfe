@@ -6,6 +6,13 @@
   <div class="content-container">
     <div class="page-header">
       <h1>Liste des utilisateurs</h1>
+      <div class="search-bar">
+        <i class="fas fa-search"></i>
+        <input type="text" placeholder="Rechercher un utilisateur..." 
+               [(ngModel)]="searchQuery" 
+               name="searchQuery"
+               (input)="onSearch()">
+      </div>
       <button class="btn primary" (click)="openAddUserModal()">
         <i class="fas fa-user-plus"></i> Ajouter un utilisateur
       </button>

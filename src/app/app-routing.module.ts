@@ -7,6 +7,12 @@ import { UserListComponent } from './user-list/user-list.component';
 import { ProfilUComponent } from './profil-u/profil-u.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { StockComponent } from './stock/stock.component';
+import { TableauComponent } from './components/tableau/tableau.component';
+import { NotificationComponent } from './notification/notification.component';
+import { OffreDetailComponent } from './offre-detail/offre-detail.component';
+import { OffreListComponent } from './offre-list/offre-list.component';
+import { CatalogueComponent } from './catalogue/catalogue.component';
+
 
 const routes: Routes = [
   { path: '', component: LoginComponent }, 
@@ -16,6 +22,11 @@ const routes: Routes = [
   { path: 'profilU', component: ProfilUComponent },
   { path: 'dashboard', component: DashboardComponent },
   { path: 'stock', component: StockComponent },
+  { path: 'tableau', component: TableauComponent },
+  { path: 'notification', component: NotificationComponent},
+  { path: 'catalogue', component: CatalogueComponent},
+  { path: 'offredetail', component: OffreDetailComponent},
+  { path: 'offrelist', component: OffreListComponent},
 
 ];
 

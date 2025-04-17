@@ -8,10 +8,16 @@ import { RouterModule } from '@angular/router';
 import { HeaderComponent } from './components/header/header.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { TableauComponent } from './components/tableau/tableau.component';
+import { NotificationComponent } from './notification/notification.component';
+import { CatalogueComponent } from './catalogue/catalogue.component';
+import { OffreDetailComponent } from './offre-detail/offre-detail.component';
+import { OffreListComponent } from './offre-list/offre-list.component';
 
 @NgModule({
   declarations: [
     AppComponent,
+    
     
     
   ],
