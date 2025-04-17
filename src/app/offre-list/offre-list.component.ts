@@ -1,114 +1,202 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { SidebarComponent } from "../components/sidebar/sidebar.component";
 import { HeaderComponent } from "../components/header/header.component";
-import { trigger, transition, style, animate } from '@angular/animations';
-
-export interface Offer {
-  id: number;
-  title: string;
-  description: string;
-  imageUrl: string;
-  popular?: boolean;
-  hasPromo?: boolean;
-  details: {
-    objectives: string[];
-    description: string;
-    features: string[];
-    price?: string;
-  };
-}
+import { Offer, OfferService } from "../services/offre.service";
 
 @Component({
   selector: 'app-offer-list',
   standalone: true,
-  imports: [RouterLink, CommonModule, SidebarComponent, HeaderComponent],
+  imports: [RouterLink, CommonModule, FormsModule, SidebarComponent, HeaderComponent],
   templateUrl: './offre-list.component.html',
   styleUrls: ['./offre-list.component.css'],
- 
 })
 export class OffreListComponent implements OnInit {
-  offers: Offer[] = [
-    {
-      id: 1,
-      title: 'FAST LINK Guichet Unique',
-      description: 'Service Internet très haut débit avec une connexion stable et garantie',
-      imageUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=1200',
-      popular: true,
-      hasPromo: true,
-      details: {
-        objectives: [
-          'Offrir aux clients une connexion très haut débit stable et garantie à des tarifs attractifs',
-          'Améliorer l\'expérience client avec un service premium',
-          'Contrecarrer les offres de la concurrence avec des avantages exclusifs'
-        ],
-        description: 'La relance de l\'offre Fast Link consiste à proposer une tarification avantageuse pour les nouveaux clients uniquement pour les accès FO Internet avec des débits supérieurs ou égal à 30M. Notre engagement est de fournir une connexion stable et performante pour répondre à tous vos besoins numériques.',
-        features: [
-          'Débit jusqu\'à 100 Mbps symétrique',
-          'Installation rapide sous 48h',
-          'Support technique dédié 24/7',
-          'Garantie de service (SLA)'
-        ],
-        price: 'À partir de 79€/mois'
-      }
-    },
-    {
-      id: 2,
-      title: 'Rapido PRO',
-      description: 'Solution professionnelle haute performance jusqu\'à 100 Mbps',
-      imageUrl: 'https://eshop.tunisietelecom.tn/entreprise/211-home_default/rapido-pro.jpg',
-      hasPromo: false,
-      details: {
-        objectives: [
-          'Fournir une connexion professionnelle stable et ultra-rapide',
-          'Garantir un support dédié 24/7',
-          'Offrir des solutions personnalisées pour chaque entreprise'
-        ],
-        description: 'Service Internet professionnel haute performance avec garantie de service et support prioritaire. Rapido PRO est conçu pour les entreprises exigeantes qui nécessitent une connexion fiable et rapide pour leurs activités quotidiennes.',
-        features: [
-          'Débit garanti jusqu\'à 100 Mbps',
-          'Adresse IP fixe incluse',
-          'Support premium avec temps de réponse garanti',
-          'Options de sécurité avancées'
-        ],
-        price: 'À partir de 129€/mois'
-      }
-    },
-    {
-      id: 3,
-      title: 'VSAT Enterprise',
-      description: 'Connectivité satellite pour les zones reculées',
-      imageUrl: 'https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?auto=format&fit=crop&q=80&w=1200',
-      popular: false,
-      hasPromo: true,
-      details: {
-        objectives: [
-          'Assurer une couverture Internet dans les zones non desservies',
-          'Fournir une solution de backup fiable',
-          'Garantir une connexion stable peu importe la localisation'
-        ],
-        description: 'Solution de connectivité par satellite idéale pour les entreprises situées dans des zones non couvertes par la fibre optique. VSAT Enterprise garantit une connexion stable et performante partout en Tunisie.',
-        features: [
-          'Couverture nationale garantie',
-          'Installation professionnelle incluse',
-          'Idéal pour les sites isolés',
-          'Solution de secours fiable'
-        ],
-        price: 'À partir de 199€/mois'
+  offers: Offer[] = [];
+  filteredOffers: Offer[] = [];
+  searchQuery: string = '';
+  
+  // Modal management
+  showOfferModal: boolean = false;
+  editMode: boolean = false;
+  currentOffer: Offer = {
+    id: 0,
+    title: '',
+    description: '',
+    imageUrl: '',
+    popular: false,
+    hasPromo: false,
+    details: {
+      objectives: [],
+      description: '',
+      features: [],
+      price: '',
+      pricing: {
+        paymentOptions: ['Paiement échelonné sur 12 mois ou 24 mois ou 36 mois', 'Paiement au comptant']
+      },
+      subscription: {
+        channels: ['La Direction Marché Entreprises', 'Les Espaces Entreprises', 'Réseaux de distribution indirecte']
       }
     }
-  ];
+  };
+  
+  // Input fields for arrays
+  featuresInput: string = '';
+  objectivesInput: string = '';
+  
+  // Delete confirmation
+  showDeleteConfirmation: boolean = false;
+  offerToDelete: Offer | null = null;
+
+  constructor(
+    private offerService: OfferService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
-    // Ajouter des animations lors du chargement de la page
-    setTimeout(() => {
-      const cards = document.querySelectorAll('.offer-card');
-      cards.forEach((card, index) => {
-        setTimeout(() => {
-          card.classList.add('visible');
-        }, index * 150);
-      });
-    }, 100);
+    this.loadOffers();
+  }
+
+  // Load all offers
+  loadOffers() {
+    this.offerService.getOffers().subscribe(offers => {
+      this.offers = offers;
+      this.filteredOffers = [...this.offers];
+      
+      // Add animation after data loads
+      setTimeout(() => {
+        const cards = document.querySelectorAll('.offer-card');
+        cards.forEach((card, index) => {
+          setTimeout(() => {
+            card.classList.add('visible');
+          }, index * 150);
+        });
+      }, 100);
+    });
+  }
+
+  // Search function
+  onSearch() {
+    if (this.searchQuery.trim()) {
+      this.filteredOffers = this.offers.filter(offer => 
+        offer.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+        offer.description.toLowerCase().includes(this.searchQuery.toLowerCase())
+      );
+    } else {
+      this.filteredOffers = [...this.offers];
+    }
+  }
+
+  // Open modal to add a new offer
+  openAddOfferModal() {
+    this.editMode = false;
+    this.currentOffer = {
+      id: 0,
+      title: '',
+      description: '',
+      imageUrl: '',
+      popular: false,
+      hasPromo: false,
+      details: {
+        objectives: [],
+        description: '',
+        features: [],
+        price: '',
+        pricing: {
+          paymentOptions: ['Paiement échelonné sur 12 mois ou 24 mois ou 36 mois', 'Paiement au comptant']
+        },
+        subscription: {
+          channels: ['La Direction Marché Entreprises', 'Les Espaces Entreprises', 'Réseaux de distribution indirecte']
+        }
+      }
+    };
+    this.featuresInput = '';
+    this.objectivesInput = '';
+    this.showOfferModal = true;
+  }
+
+  // Open modal to edit an existing offer
+  editOffer(offer: Offer, event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    this.editMode = true;
+    this.currentOffer = JSON.parse(JSON.stringify(offer)); // Deep copy
+    this.featuresInput = this.currentOffer.details.features.join('; ');
+    this.objectivesInput = this.currentOffer.details.objectives.join('; ');
+    this.showOfferModal = true;
+  }
+
+  // Close the offer modal
+  closeOfferModal() {
+    this.showOfferModal = false;
+  }
+
+  // Submit the offer form
+  onSubmitOfferForm() {
+    // Process features and objectives from input string
+    if (this.featuresInput) {
+      this.currentOffer.details.features = this.featuresInput
+        .split(';')
+        .map(feature => feature.trim())
+        .filter(feature => feature.length > 0);
+    } else {
+      this.currentOffer.details.features = [];
+    }
+
+    if (this.objectivesInput) {
+      this.currentOffer.details.objectives = this.objectivesInput
+        .split(';')
+        .map(objective => objective.trim())
+        .filter(objective => objective.length > 0);
+    } else {
+      this.currentOffer.details.objectives = [];
+    }
+
+    if (this.editMode) {
+      this.offerService.updateOffer(this.currentOffer);
+      this.loadOffers(); // Refresh the list
+      this.closeOfferModal();
+    } else {
+      // For a new offer, we use the addOffer method from your service
+      // We need to omit the id as it will be generated
+      const { id, ...offerWithoutId } = this.currentOffer;
+      this.offerService.addOffer(offerWithoutId);
+      this.loadOffers(); // Refresh the list
+      this.closeOfferModal();
+    }
+  }
+
+  // Open delete confirmation modal
+  confirmDelete(offer: Offer, event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    this.offerToDelete = offer;
+    this.showDeleteConfirmation = true;
+  }
+
+  // Delete offer after confirmation
+  deleteOfferConfirmed() {
+    if (this.offerToDelete) {
+      this.offerService.deleteOffer(this.offerToDelete.id);
+      this.loadOffers(); // Refresh the list
+      this.cancelDelete();
+    }
+  }
+
+  // Cancel delete operation
+  cancelDelete() {
+    this.showDeleteConfirmation = false;
+    this.offerToDelete = null;
+  }
+
+  // View offer details
+  viewOfferDetails(id: number, event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.router.navigate(['/offer', id]);
   }
 }
