@@ -16,6 +16,7 @@ import { CatalogueComponent } from './catalogue/catalogue.component';
 import { ReservationComponent } from './reservation/reservation.component';
 
 import { OffreFormComponent } from './offre-form/offre-form.component';
+import { TableauReservationComponent } from './components/tableau-reservation/tableau-reservation.component';
 
 
 
@@ -33,6 +34,7 @@ const routes: Routes = [
   { path: 'offredetail/:id', component: OffreDetailComponent },
   { path: 'offrelist', component: OffreListComponent},
   { path: 'reservation', component: ReservationComponent},
+  { path: 'tableau-reservation', component: TableauReservationComponent},
 
 
 

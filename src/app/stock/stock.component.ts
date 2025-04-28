@@ -1,12 +1,15 @@
-import { Component, OnInit } from '@angular/core';
-import { StockService } from '../services/stock.service';
-import { Router } from '@angular/router';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { StockService, ReservationDetails } from '../services/stock.service';
+import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { SidebarComponent } from '../components/sidebar/sidebar.component';
 import { HeaderComponent } from '../components/header/header.component';
 import { NotificationComponent } from '../notification/notification.component';
+import { Subscription } from 'rxjs';
+
 
 
 export interface Stock {
@@ -20,14 +23,22 @@ export interface Stock {
   endOfSupport: string;
 }
 
+export interface Reservation {
+  id: number;
+  stockId: number;
+  quantity: number;
+  date: string;
+  comment?: string;
+}
+
 @Component({
   selector: 'app-stock',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule, SidebarComponent, HeaderComponent, NotificationComponent],
+  imports: [CommonModule, FormsModule,RouterModule, HttpClientModule, SidebarComponent, HeaderComponent, NotificationComponent],
   templateUrl: './stock.component.html',
   styleUrl: './stock.component.css'
 })
-export class StockComponent implements OnInit {
+export class StockComponent implements OnInit, OnDestroy {
   stocks: Stock[] = [];
   filteredStocks: Stock[] = [];
   displayedStocks: Stock[] = []; // Stocks affichés sur la page courante
@@ -42,6 +53,22 @@ export class StockComponent implements OnInit {
   showDeleteConfirmation: boolean = false;
   stockToDelete: Stock | null = null;
   
+  // Propriétés pour la réservation
+  showReservationModal: boolean = false;
+  stockToReserve: Stock | null = null;
+  reservationQuantity: number = 1;
+  reservationDate: string = '';
+  reservationComment: string = '';
+  
+  // Nouvelle propriété pour le modal de confirmation de réservation
+  showReservationConfirmModal: boolean = false;
+  
+  // Nouvelle propriété pour stocker les détails de réservation
+  reservationDetails: ReservationDetails | null = null;
+  
+  // Abonnement pour nettoyer lors de la destruction
+  private reservationSubscription: Subscription | null = null;
+  
   // Propriétés de pagination
   currentPage: number = 1;
   itemsPerPage: number = 8;
@@ -49,14 +76,40 @@ export class StockComponent implements OnInit {
   
   constructor(
     private router: Router, 
+    private route: ActivatedRoute,
     private stockService: StockService
   ) {
     this.showStockModal = false;
     this.showDeleteConfirmation = false;
+    this.showReservationModal = false;
+    this.showReservationConfirmModal = false;
   }
 
   ngOnInit() {
     this.loadStocks();
+    
+    // S'abonner aux détails de réservation
+    this.reservationSubscription = this.stockService.reservationDetails$.subscribe(details => {
+      this.reservationDetails = details;
+      
+      // Si des détails existent et si le paramètre d'URL indique qu'il faut afficher le modal
+      this.route.queryParams.subscribe(params => {
+        if (params['showReservationConfirm'] === 'true' && this.reservationDetails) {
+          this.showReservationConfirmModal = true;
+        }
+      });
+    });
+    
+    // Initialiser la date de réservation à aujourd'hui
+    const today = new Date();
+    this.reservationDate = today.toISOString().split('T')[0];
+  }
+  
+  ngOnDestroy() {
+    // Nettoyer l'abonnement
+    if (this.reservationSubscription) {
+      this.reservationSubscription.unsubscribe();
+    }
   }
 
   private initStock(): Stock {
@@ -262,6 +315,75 @@ export class StockComponent implements OnInit {
         }
       });
     }
+  }
+  
+// Ouvrir le modal de réservation
+openReservationModal(stock?: Stock): void {
+  // Vérifier s'il y a des détails de réservation disponibles dans le service
+  const reservationDetails = this.stockService.getReservationDetails();
+  
+  if (reservationDetails) {
+    console.log('Détails de réservation trouvés:', reservationDetails);
+    // Si des détails de réservation existent, afficher le modal de confirmation
+    this.reservationDetails = reservationDetails;
+    this.showReservationConfirmModal = true;
+    return;
+  } else {
+    console.log('Aucun détail de réservation trouvé');
+  }
+  
+  // Sinon, continuer avec le comportement existant
+  if (stock) {
+    this.stockToReserve = stock;
+  } else if (this.stocks.length > 0) {
+    // Par défaut, sélectionnez le premier stock si aucun n'est spécifié
+    this.stockToReserve = this.stocks[0];
+  } else {
+    alert("Aucun stock disponible pour réservation");
+    return;
+  }
+  
+  this.reservationQuantity = 1;
+  this.reservationDate = new Date().toISOString().split('T')[0];
+  this.reservationComment = '';
+  this.showReservationModal = true;
+}
+  // Confirmer la réservation depuis le modal de confirmation
+  confirmReservation(): void {
+    if (!this.reservationDetails) return;
+    
+    console.log('Réservation confirmée:', this.reservationDetails);
+    
+    // Ici vous effectueriez l'action réelle de réservation
+    // Par exemple, mettre à jour le stock, enregistrer dans la base de données, etc.
+    
+    // Trouver l'article correspondant dans le stock (si nécessaire)
+    const stockItem = this.stocks.find(s => 
+      s.article.toLowerCase() === this.reservationDetails?.article.toLowerCase() &&
+      s.constructeur.toLowerCase() === this.reservationDetails?.constructeur.toLowerCase() &&
+      s.categorie.toLowerCase() === this.reservationDetails?.categorie.toLowerCase()
+    );
+    
+    if (stockItem) {
+      // Vous pourriez par exemple mettre à jour la quantité ici
+      // stockItem.quantite -= 1; // Diminuer le stock
+      
+      // Et mettre à jour le stock en base de données
+      // this.stockService.updateStock(stockItem.id, stockItem).subscribe(...);
+    }
+    
+    // Afficher un message de confirmation
+    alert(`Réservation pour le projet ${this.reservationDetails.nomProjet} effectuée avec succès.`);
+    
+    // Fermer le modal et effacer les détails
+    this.showReservationConfirmModal = false;
+    this.stockService.clearReservationDetails();
+  }
+
+  // Annuler la réservation
+  cancelReservation(): void {
+    this.showReservationConfirmModal = false;
+    this.stockService.clearReservationDetails();
   }
 
   // Méthode d'aide pour extraire des messages d'erreur

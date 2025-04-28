@@ -1,0 +1,58 @@
+<app-sidebar></app-sidebar>
+<main class="main-content">
+  <app-header></app-header>
+  <div class="table-container">
+    <div class="header-section">
+      <div class="title-section">
+        <h2>Liste des réservations</h2>
+       </div>
+    </div>
+
+    <div *ngIf="showSuccessMessage" class="success-message">
+      Statut mis à jour avec succès !
+    </div>
+
+    <div class="table-responsive">
+      <table class="stock-table">
+        <thead>
+          <tr>
+            <th>Nom du Projet</th> <!-- Nouvelle colonne -->
+            <th>Constructeur</th>
+            <th>Catégorie</th>
+            <th>Article</th>
+            <th>Date de réservation</th>
+            <th>Status</th>
+            <th>Actions</th> <!-- Nouvelle colonne pour les actions -->
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of filteredReservationData; let i = index">
+            <td>{{ item.nomDuProjet }}</td> <!-- Affichage du nom du projet -->
+            <td>{{ item.constructeur }}</td>
+            <td>{{ item.categorie }}</td>
+            <td>{{ item.article }}</td>
+            <td>{{ item.dateReservation }}</td>
+            <td>{{ item.status }}</td> <!-- Affichage du status actuel -->
+            
+              <!-- Boutons pour changer le statut -->
+              <td>
+                <div class="status-buttons">
+                  <button (click)="updateStatus(i, 'CONFIRMEE')">Confirmer</button>
+                  <button (click)="updateStatus(i, 'ANNULEE')">Annuler</button>
+                </div>
+              </td>
+          </tr>
+          <tr *ngIf="filteredReservationData.length === 0">
+            <td colspan="7" class="no-data">Aucune donnée disponible</td> 
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination" *ngIf="filteredReservationData.length > 0">
+      <button class="page-btn" [disabled]="currentPage === 1" (click)="goToPreviousPage()">← Précédent</button>
+      <span class="page-info">Page {{ currentPage }} sur {{ totalPages }}</span>
+      <button class="page-btn" [disabled]="currentPage === totalPages" (click)="goToNextPage()">Suivant →</button>
+    </div>
+  </div>
+</main>

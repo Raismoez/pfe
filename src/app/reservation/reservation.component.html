@@ -1,128 +1,134 @@
 <main>
-    <div class="action-container">
-      <button class="btn-add" (click)="openReservationModal()">
-        <i class="fas fa-calendar-plus"></i>
-        Faire une réservation
-      </button>
+  <div class="action-container">
+    <button class="btn-add" (click)="openReservationModal()">
+      <i class="fas fa-calendar-plus"></i>
+      Faire une réservation
+    </button>
+  </div>
+
+  <!-- Message de succès -->
+  <div class="success-message" *ngIf="showSuccessMessage">
+    <div class="success-content">
+      <i class="fas fa-check-circle"></i>
+      <span>Réservation effectuée avec succès!</span>
     </div>
-  
-    <!-- Message de succès -->
-    <div class="success-message" *ngIf="showSuccessMessage">
-      <div class="success-content">
-        <i class="fas fa-check-circle"></i>
-        <span>Réservation effectuée avec succès!</span>
-      </div>
+  </div>
+
+  <!-- Modal de réservations -->
+  <div class="modal reservation-modal" *ngIf="showReservationModal">
+    <div class="modal-content">
+      <h2>Faire une Réservation</h2>
+      <form (ngSubmit)="submitReservation()">
+        <div class="info-group">
+          <label for="nomDuProjet">Nom du projet</label>
+          <input
+            type="text"
+            id="nomDuProjet"
+            [(ngModel)]="reservationData.nomDuProjet"
+            name="nomDuProjet"
+            placeholder="Entrez le nom du projet"
+            required
+            #nomDuProjetInput="ngModel"
+            [ngClass]="{ 'invalid': nomDuProjetInput.invalid && nomDuProjetInput.touched }"
+          >
+          <div *ngIf="nomDuProjetInput.invalid && nomDuProjetInput.touched" class="alert">
+            Le nom du projet est requis.
+          </div>
+        </div>
+
+        <!-- Nouveau champ "Constructeur" avec liste déroulante -->
+        <div class="info-group">
+          <label for="constructeur">Constructeur</label>
+          <select
+            id="constructeur"
+            [(ngModel)]="reservationData.constructeur"
+            name="constructeur"
+            required
+            #constructeurInput="ngModel"
+            [ngClass]="{ 'invalid': constructeurInput.invalid && constructeurInput.touched }"
+            class="filter-select"
+          >
+            <option value="" disabled selected>Choisir un constructeur</option>
+            <option value="cisco">Cisco</option>
+            <option value="huawei">Huawei</option>
+            <option value="fortinet">Fortinet</option>
+          </select>
+          <div *ngIf="constructeurInput.invalid && constructeurInput.touched" class="alert">
+            Le constructeur est requis.
+          </div>
+        </div>
+
+        <!-- Champ "Catégorie" avec liste déroulante -->
+        <div class="info-group">
+          <label for="categorie">Catégorie</label>
+          <select
+            id="categorie"
+            [(ngModel)]="reservationData.categorie"
+            name="categorie"
+            required
+            #categorieInput="ngModel"
+            [ngClass]="{ 'invalid': categorieInput.invalid && categorieInput.touched }"
+            class="filter-select"
+            (change)="onCategoryChange()"
+          >
+            <option value="" disabled selected>Choisir une catégorie</option>
+            <option value="carteNIM">Carte NIM</option>
+            <option value="jarretiereOptique">Jarretière Optique</option>
+            <option value="moduleSFP">Module SFP</option>
+            <option value="routeur">Routeur</option>
+            <option value="switch">Switch</option>
+          </select>
+          <div *ngIf="categorieInput.invalid && categorieInput.touched" class="alert">
+            La catégorie est requise.
+          </div>
+        </div>
+
+        <!-- Champ "Article" -->
+        <div class="info-group">
+          <label for="article">Article</label>
+          <select
+            id="article"
+            [(ngModel)]="reservationData.article"
+            name="article"
+            required
+            #articleInput="ngModel"
+            [ngClass]="{ 'invalid': articleInput.invalid && articleInput.touched }"
+            class="filter-select"
+          >
+            <option value="" disabled selected>Choisir un article</option>
+            <option *ngFor="let article of articlesForSelectedCategory" [value]="article">
+              {{ article }}
+            </option>
+          </select>
+          <div *ngIf="articleInput.invalid && articleInput.touched" class="alert">
+            L'article est requis.
+          </div>
+        </div>
+
+        <!-- Champ "DATE" -->
+        <div class="info-group">
+          <label for="dateReservation">Date de réservation</label>
+          <input
+            type="date"
+            id="dateReservation"
+            [(ngModel)]="reservationData.dateReservation"
+            name="dateReservation"
+            required
+            #dateInput="ngModel"
+            [ngClass]="{ 'invalid': dateInput.invalid && dateInput.touched }"
+          >
+          <div *ngIf="dateInput.invalid && dateInput.touched" class="alert">
+            La date est requise.
+          </div>
+        </div>
+
+        <div class="modal-buttons">
+          <button type="button" (click)="submitReservation()" class="btn primary" [disabled]="nomDuProjetInput.invalid || constructeurInput.invalid || categorieInput.invalid || articleInput.invalid || dateInput.invalid">
+            Réserver
+          </button>
+          <button type="button" class="btn secondary" (click)="closeReservationModal()">Annuler</button>
+        </div>
+      </form>
     </div>
-  
-    <!-- Modal de réservations -->
-    <div class="modal reservation-modal" *ngIf="showReservationModal">
-      <div class="modal-content">
-        <h2>Faire une Réservation</h2>
-        <form (ngSubmit)="submitReservation()">
-          <div class="info-group">
-            <label for="projectName">Nom du projet</label>
-            <input
-              type="text"
-              id="projectName"
-              [(ngModel)]="reservationData.projectName"
-              name="projectName"
-              placeholder="Entrez le nom du projet"
-              required
-              #projectNameInput="ngModel"
-              [ngClass]="{ 'invalid': projectNameInput.invalid && projectNameInput.touched }"
-            >
-            <div *ngIf="projectNameInput.invalid && projectNameInput.touched" class="alert">
-              Le nom du projet est requis.
-            </div>
-          </div>
-  
-          <!-- Nouveau champ "Constructeur" avec liste déroulante -->
-          <div class="info-group">
-            <label for="constructor">Constructeur</label>
-            <select
-              id="constructor"
-              [(ngModel)]="reservationData.constructor"
-              name="constructor"
-              required
-              #constructorInput="ngModel"
-              [ngClass]="{ 'invalid': constructorInput.invalid && constructorInput.touched }"
-              class="filter-select"
-            >
-              <option value="" disabled selected>Choisir un constructeur</option>
-              <option value="cisco">Cisco</option>
-              <option value="huawei">Huawei</option>
-              <option value="fortinet">Fortinet</option>
-            </select>
-            <div *ngIf="constructorInput.invalid && constructorInput.touched" class="alert">
-              Le constructeur est requis.
-            </div>
-          </div>
-  
-          <!-- Champ "Catégorie" avec liste déroulante -->
-          <div class="info-group">
-            <label for="category">Catégorie</label>
-            <select
-              id="category"
-              [(ngModel)]="reservationData.category"
-              name="category"
-              required
-              #categoryInput="ngModel"
-              [ngClass]="{ 'invalid': categoryInput.invalid && categoryInput.touched }"
-              class="filter-select"
-            >
-              <option value="" disabled selected>Choisir une catégorie</option>
-              <option value="carteNIM">Carte NIM</option>
-              <option value="jarretiereOptique">Jarretière Optique</option>
-              <option value="moduleSFP">Module SFP</option>
-              <option value="routeur">Routeur</option>
-              <option value="switch">Switch</option>
-            </select>
-            <div *ngIf="categoryInput.invalid && categoryInput.touched" class="alert">
-              La catégorie est requise.
-            </div>
-          </div>
-  
-          <!-- Champ "Article" -->
-          <div class="info-group">
-            <label for="article">Article</label>
-            <input
-              type="text"
-              id="article"
-              [(ngModel)]="reservationData.article"
-              name="article"
-              placeholder="Entrez le nom de l'article"
-              required
-              #articleInput="ngModel"
-              [ngClass]="{ 'invalid': articleInput.invalid && articleInput.touched }"
-            >
-            <div *ngIf="articleInput.invalid && articleInput.touched" class="alert">
-              L'article est requis.
-            </div>
-          </div>
-  
-          <div class="info-group">
-            <label for="date">Date de réservation</label>
-            <input
-              type="date"
-              id="date"
-              [(ngModel)]="reservationData.date"
-              name="date"
-              required
-              #dateInput="ngModel"
-              [ngClass]="{ 'invalid': dateInput.invalid && dateInput.touched }"
-            >
-            <div *ngIf="dateInput.invalid && dateInput.touched" class="alert">
-              La date est requise.
-            </div>
-          </div>
-  
-          <div class="modal-buttons">
-            <button type="button" (click)="submitReservation()" class="btn primary" [disabled]="projectNameInput.invalid || constructorInput.invalid || categoryInput.invalid || articleInput.invalid || dateInput.invalid">
-              Réserver
-            </button>
-            <button type="button" class="btn secondary" (click)="closeReservationModal()">Annuler</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </main>
+  </div>
+</main>

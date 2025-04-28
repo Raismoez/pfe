@@ -16,10 +16,12 @@ import { OffreListComponent } from './offre-list/offre-list.component';
 
 import { ReservationComponent } from './reservation/reservation.component';
 import { OffreFormComponent } from './offre-form/offre-form.component';
+import { TableauReservationComponent } from './components/tableau-reservation/tableau-reservation.component';
 
 @NgModule({
   declarations: [
     AppComponent,
+    
   
     
     
