@@ -102,12 +102,11 @@
     </div>
     
     <!-- Action buttons -->
-    <div class="action-buttons">
-      <a routerLink="/offrelist" class="btn back-btn">
-        <i class="bi bi-arrow-left"></i> Retour aux offres
-      </a>
-      
-    </div>
+<div class="action-buttons">
+  <button class="btn back-btn" (click)="goBack()">
+    <i class="bi bi-arrow-left"></i> Retour aux offres {{ category ? (category === 'corporate-vpn' ? 'Corporate VPN' : 'SD-WAN') : '' }}
+  </button>
+</div>
     
   </div>
 </main>

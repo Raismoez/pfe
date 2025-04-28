@@ -77,6 +77,24 @@
   <div class="modal-content">
     <h2>{{ editMode ? 'Modifier' : 'Ajouter' }} une offre</h2>
     <form (ngSubmit)="onSubmitOfferForm()">
+      
+      <div class="info-group">
+        <label>Type d'offre</label>
+        <select 
+          [(ngModel)]="currentOffer.offreType" 
+          name="offreType" 
+          required
+          #offreTypeInput="ngModel"
+          [ngClass]="{ 'invalid': offreTypeInput.invalid && offreTypeInput.touched }">
+          <option value="">-- Sélectionnez un type --</option>
+          <option value="corporate-vpn">Corporate VPN</option>
+          <option value="sd-wan">SD-WAN</option>
+        </select>
+        <div *ngIf="offreTypeInput.invalid && offreTypeInput.touched" class="alert">
+          Le type d'offre est requis.
+        </div>
+      </div>
+
       <div class="info-group">
         <label>Titre</label>
         <input 

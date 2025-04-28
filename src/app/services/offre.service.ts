@@ -1,13 +1,15 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { catchError, tap, map } from 'rxjs/operators';
 
 export interface Offer {
   id: number;
   title: string;
   description: string;
   imageUrl: string;
+  offreType?: string; 
   popular?: boolean;
-  hasPromo?: boolean;
   details: {
     objectives: string[];
     description: string;
@@ -21,161 +23,155 @@ export interface Offer {
     };
   };
 }
-
 @Injectable({
   providedIn: 'root'
 })
 export class OfferService {
-  private offersSubject = new BehaviorSubject<Offer[]>([
-    {
-      id: 1,
-      title: 'FAST LINK Guichet Unique',
-      description: 'Service Internet très haut débit avec une connexion stable et garantie',
-      imageUrl: 'https://topnet.tn/u_p_l_d/offres/smart-lik_15_0252452001717495224665ee5b83da73.png',
-      popular: true,
-      hasPromo: true,
-      details: {
-        objectives: [
-          'Offrir aux clients une connexion très haut débit stable et garantie à des tarifs attractifs',
-          'Améliorer l\'expérience client avec un service premium',
-          'Contrecarrer les offres de la concurrence avec des avantages exclusifs'
-        ],
-        description: 'La relance de l\'offre Fast Link consiste à proposer une tarification avantageuse pour les nouveaux clients uniquement pour les accès FO Internet avec des débits supérieurs ou égal à 30M. Notre engagement est de fournir une connexion stable et performante pour répondre à tous vos besoins numériques.',
-        features: [
-          'Débit jusqu\'à 100 Mbps symétrique',
-          'Installation rapide sous 48h',
-          'Support technique dédié 24/7',
-          'Garantie de service (SLA)'
-        ],
-        price: 'À partir de 79€/mois',
-        pricing: {
-          paymentOptions: [
-            'Paiement échelonné sur 12 mois ou 24 mois ou 36 mois',
-            'Paiement au comptant',
-            'À partir de 79€/mois'
-          ]
-        },
-        subscription: {
-          channels: [
-            'La Direction Marché Entreprises',
-            'Les Espaces Entreprises',
-            'Réseaux de distribution indirecte'
-          ]
-        }
-      }
-    },
-    {
-      id: 2,
-      title: 'Rapido PRO',
-      description: 'Solution professionnelle haute performance jusqu\'à 100 Mbps',
-      imageUrl: 'https://www.topnet.tn/u_p_l_d/offres/smart-rapido-pro_86_0710448001699976624655395b0ad77b.png',
-      hasPromo: false,
-      details: {
-        objectives: [
-          'Fournir une connexion professionnelle stable et ultra-rapide',
-          'Garantir un support dédié 24/7',
-          'Offrir des solutions personnalisées pour chaque entreprise'
-        ],
-        description: 'Service Internet professionnel haute performance avec garantie de service et support prioritaire. Rapido PRO est conçu pour les entreprises exigeantes qui nécessitent une connexion fiable et rapide pour leurs activités quotidiennes.',
-        features: [
-          'Débit garanti jusqu\'à 100 Mbps',
-          'Adresse IP fixe incluse',
-          'Support premium avec temps de réponse garanti',
-          'Options de sécurité avancées'
-        ],
-        price: 'À partir de 129€/mois',
-        pricing: {
-          paymentOptions: [
-            'Paiement échelonné sur 12 mois ou 24 mois ou 36 mois',
-            'Paiement au comptant'
-          ]
-        },
-        subscription: {
-          channels: [
-            'La Direction Marché Entreprises',
-            'Les Espaces Entreprises',
-            'Réseaux de distribution indirecte'
-          ]
-        }
-      }
-    },
-    {
-      id: 3,
-      title: 'VSAT Enterprise',
-      description: 'Connectivité satellite pour les zones reculées',
-      imageUrl: 'https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?auto=format&fit=crop&q=80&w=1200',
-      popular: false,
-      hasPromo: true,
-      details: {
-        objectives: [
-          'Assurer une couverture Internet dans les zones non desservies',
-          'Fournir une solution de backup fiable',
-          'Garantir une connexion stable peu importe la localisation'
-        ],
-        description: 'Solution de connectivité par satellite idéale pour les entreprises situées dans des zones non couvertes par la fibre optique. VSAT Enterprise garantit une connexion stable et performante partout en Tunisie.',
-        features: [
-          'Couverture nationale garantie',
-          'Installation professionnelle incluse',
-          'Idéal pour les sites isolés',
-          'Solution de secours fiable'
-        ],
-        price: 'À partir de 199€/mois',
-        pricing: {
-          paymentOptions: [
-            'Paiement échelonné sur 12 mois ou 24 mois ou 36 mois',
-            'Paiement au comptant'
-          ]
-        },
-        subscription: {
-          channels: [
-            'La Direction Marché Entreprises',
-            'Les Espaces Entreprises',
-            'Réseaux de distribution indirecte'
-          ]
-        }
-      }
-    }
-  ]);
-
+  private offersSubject = new BehaviorSubject<Offer[]>([]);
   offers$ = this.offersSubject.asObservable();
+  
+  // Replace with your Spring Boot API URL
+  private apiUrl = 'http://localhost:8080/api/offers';
 
-  constructor() { }
+  constructor(private http: HttpClient) {
+    // Load offers from backend when service is initialized
+    this.loadOffers();
+  }
+
+  private loadOffers(): void {
+    this.http.get<any[]>(this.apiUrl)
+      .pipe(
+        map(rawOffers => this.mapResponseToOffers(rawOffers)),
+        catchError(this.handleError)
+      )
+      .subscribe(offers => {
+        this.offersSubject.next(offers);
+      });
+  }
 
   getOffers(): Observable<Offer[]> {
     return this.offers$;
   }
 
-  getOfferById(id: number): Offer | undefined {
-    return this.offersSubject.value.find(offer => offer.id === id);
+  getOfferById(id: number): Observable<Offer> {
+    return this.http.get<any>(`${this.apiUrl}/${id}`)
+      .pipe(
+        map(rawOffer => this.mapResponseToOffer(rawOffer)),
+        catchError(this.handleError)
+      );
   }
 
-  addOffer(offer: Omit<Offer, 'id'>): void {
-    const currentOffers = this.offersSubject.value;
-    const newId = currentOffers.length > 0 
-      ? Math.max(...currentOffers.map(o => o.id)) + 1 
-      : 1;
+  searchOffers(query: string): Observable<Offer[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/search?query=${query}`)
+      .pipe(
+        map(rawOffers => this.mapResponseToOffers(rawOffers)),
+        catchError(this.handleError)
+      );
+  }
+
+  addOffer(offer: Omit<Offer, 'id'>): Observable<Offer> {
+    const requestPayload = this.prepareOfferForRequest(offer);
     
-    const newOffer: Offer = {
-      ...offer,
-      id: newId
+    return this.http.post<any>(this.apiUrl, requestPayload)
+      .pipe(
+        map(response => this.mapResponseToOffer(response)),
+        tap(newOffer => {
+          const currentOffers = this.offersSubject.value;
+          this.offersSubject.next([...currentOffers, newOffer]);
+        }),
+        catchError(this.handleError)
+      );
+  }
+
+  updateOffer(updatedOffer: Offer): Observable<Offer> {
+    const requestPayload = this.prepareOfferForRequest(updatedOffer);
+
+    return this.http.put<any>(`${this.apiUrl}/${updatedOffer.id}`, requestPayload)
+      .pipe(
+        map(response => this.mapResponseToOffer(response)),
+        tap(updated => {
+          const currentOffers = this.offersSubject.value;
+          const index = currentOffers.findIndex(o => o.id === updated.id);
+          if (index !== -1) {
+            const newOffers = [...currentOffers];
+            newOffers[index] = updated;
+            this.offersSubject.next(newOffers);
+          }
+        }),
+        catchError(this.handleError)
+      );
+  }
+
+  deleteOffer(id: number): Observable<boolean> {
+    return this.http.delete<any>(`${this.apiUrl}/${id}`)
+      .pipe(
+        map(response => response.deleted || true),
+        tap(_ => {
+          const currentOffers = this.offersSubject.value;
+          this.offersSubject.next(currentOffers.filter(offer => offer.id !== id));
+        }),
+        catchError(this.handleError)
+      );
+  }
+
+  // Map backend response to Offer model
+  private mapResponseToOffer(data: any): Offer {
+    return {
+      id: data.id,
+      title: data.title,
+      description: data.description,
+      imageUrl: data.imageUrl,
+      offreType: data.offreType, 
+      popular: data.popular || false,
+      details: {
+        objectives: data.objectives || [],
+        description: data.detailsDescription || '',
+        features: data.features || [],
+        price: data.prix || '',
+        pricing: {
+          paymentOptions: data.paymentOptions || []
+        },
+        subscription: {
+          channels: data.subscriptionChannels || []
+        }
+      }
     };
-    
-    this.offersSubject.next([...currentOffers, newOffer]);
   }
 
-  updateOffer(updatedOffer: Offer): void {
-    const currentOffers = this.offersSubject.value;
-    const index = currentOffers.findIndex(offer => offer.id === updatedOffer.id);
-    
-    if (index !== -1) {
-      const newOffers = [...currentOffers];
-      newOffers[index] = updatedOffer;
-      this.offersSubject.next(newOffers);
+  // Map multiple backend responses to Offer models
+  private mapResponseToOffers(data: any[]): Offer[] {
+    return data.map(item => this.mapResponseToOffer(item));
+  }
+
+  // Prepare Offer for backend request
+  private prepareOfferForRequest(offer: Offer | Omit<Offer, 'id'>): any {
+    return {
+      id: 'id' in offer ? offer.id : undefined,
+      title: offer.title,
+      description: offer.description,
+      imageUrl: offer.imageUrl,
+      offreType: offer.offreType, // Ajout du champ offreType
+      popular: offer.popular,
+      objectives: offer.details.objectives || [],
+      detailsDescription: offer.details.description,
+      features: offer.details.features || [],
+      prix: offer.details.price || '',
+      paymentOptions: offer.details.pricing?.paymentOptions || [],
+      subscriptionChannels: offer.details.subscription?.channels || []
+    };
+  }
+
+  // Error handling
+  private handleError(error: HttpErrorResponse) {
+    let errorMessage = 'An unknown error occurred!';
+    if (error.error instanceof ErrorEvent) {
+      // Client-side error
+      errorMessage = `Error: ${error.error.message}`;
+    } else {
+      // Server-side error
+      errorMessage = `Server returned code: ${error.status}, error message is: ${error.message}`;
     }
-  }
-
-  deleteOffer(id: number): void {
-    const currentOffers = this.offersSubject.value;
-    this.offersSubject.next(currentOffers.filter(offer => offer.id !== id));
+    console.error(errorMessage);
+    return throwError(() => new Error(errorMessage));
   }
 }

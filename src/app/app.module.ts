@@ -15,7 +15,7 @@ import { OffreDetailComponent } from './offre-detail/offre-detail.component';
 import { OffreListComponent } from './offre-list/offre-list.component';
 
 import { ReservationComponent } from './reservation/reservation.component';
-import { OffreFormComponent } from './offre-form/offre-form.component';
+
 
 @NgModule({
   declarations: [

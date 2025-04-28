@@ -15,7 +15,7 @@ import { CatalogueComponent } from './catalogue/catalogue.component';
 
 import { ReservationComponent } from './reservation/reservation.component';
 
-import { OffreFormComponent } from './offre-form/offre-form.component';
+
 
 
 

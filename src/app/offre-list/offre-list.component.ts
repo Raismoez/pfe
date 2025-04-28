@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import { RouterLink, Router } from '@angular/router';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SidebarComponent } from "../components/sidebar/sidebar.component";
 import { HeaderComponent } from "../components/header/header.component";
 import { Offer, OfferService } from "../services/offre.service";
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-offer-list',
@@ -13,10 +14,12 @@ import { Offer, OfferService } from "../services/offre.service";
   templateUrl: './offre-list.component.html',
   styleUrls: ['./offre-list.component.css'],
 })
-export class OffreListComponent implements OnInit {
+export class OffreListComponent implements OnInit, OnDestroy {
   offers: Offer[] = [];
   filteredOffers: Offer[] = [];
   searchQuery: string = '';
+  categoryFilter: string = '';
+  categoryTitle: string = 'Toutes les offres';
   
   // Modal management
   showOfferModal: boolean = false;
@@ -27,7 +30,6 @@ export class OffreListComponent implements OnInit {
     description: '',
     imageUrl: '',
     popular: false,
-    hasPromo: false,
     details: {
       objectives: [],
       description: '',
@@ -50,72 +52,132 @@ export class OffreListComponent implements OnInit {
   showDeleteConfirmation: boolean = false;
   offerToDelete: Offer | null = null;
 
+  private subscriptions: Subscription[] = [];
+
   constructor(
     private offerService: OfferService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
-    this.loadOffers();
+    // Subscribe to route query params to get the category filter
+    this.subscriptions.push(
+      this.route.queryParams.subscribe(params => {
+        this.categoryFilter = params['category'] || '';
+        
+        // Set category title
+        if (this.categoryFilter === 'corporate-vpn') {
+          this.categoryTitle = 'Offres Corporate VPN';
+        } else if (this.categoryFilter === 'sd-wan') {
+          this.categoryTitle = 'Offres SD-WAN';
+        } else {
+          this.categoryTitle = 'Toutes les offres';
+        }
+        
+        this.loadOffers();
+      })
+    );
   }
 
-  // Load all offers
-  loadOffers() {
-    this.offerService.getOffers().subscribe(offers => {
-      this.offers = offers;
-      this.filteredOffers = [...this.offers];
-      
-      // Add animation after data loads
-      setTimeout(() => {
-        const cards = document.querySelectorAll('.offer-card');
-        cards.forEach((card, index) => {
-          setTimeout(() => {
-            card.classList.add('visible');
-          }, index * 150);
-        });
-      }, 100);
-    });
+  ngOnDestroy() {
+    // Clean up subscriptions to prevent memory leaks
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
+
+  // Load all offers and filter by category if needed
+  loadOffers() {
+    const sub = this.offerService.getOffers().subscribe({
+      next: offers => {
+        this.offers = offers;
+        
+        // Filter offers by category if a category is selected
+        if (this.categoryFilter) {
+          this.filteredOffers = this.filterOffersByCategory(offers, this.categoryFilter);
+        } else {
+          this.filteredOffers = [...this.offers];
+        }
+        
+        // Add animation after data loads
+        setTimeout(() => {
+          const cards = document.querySelectorAll('.offer-card');
+          cards.forEach((card, index) => {
+            setTimeout(() => {
+              card.classList.add('visible');
+            }, index * 150);
+          });
+        }, 100);
+      },
+      error: error => {
+        console.error('Error loading offers:', error);
+      }
+    });
+    
+    this.subscriptions.push(sub);
+  }
+
+  // Filter offers by category
+  // Filter offers by category
+filterOffersByCategory(offers: Offer[], category: string): Offer[] {
+  // Utiliser directement le champ offreType
+  return offers.filter(offer => offer.offreType === category);
+}
 
   // Search function
   onSearch() {
     if (this.searchQuery.trim()) {
-      this.filteredOffers = this.offers.filter(offer => 
+      // First filter by category if needed
+      let baseOffers = this.categoryFilter ? 
+        this.filterOffersByCategory(this.offers, this.categoryFilter) : 
+        this.offers;
+      
+      // Then apply search filter
+      this.filteredOffers = baseOffers.filter(offer => 
         offer.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
         offer.description.toLowerCase().includes(this.searchQuery.toLowerCase())
       );
     } else {
-      this.filteredOffers = [...this.offers];
+      // If search is cleared, just apply category filter if needed
+      if (this.categoryFilter) {
+        this.filteredOffers = this.filterOffersByCategory(this.offers, this.categoryFilter);
+      } else {
+        this.filteredOffers = [...this.offers];
+      }
     }
   }
 
-  // Open modal to add a new offer
-  openAddOfferModal() {
-    this.editMode = false;
-    this.currentOffer = {
-      id: 0,
-      title: '',
-      description: '',
-      imageUrl: '',
-      popular: false,
-      hasPromo: false,
-      details: {
-        objectives: [],
-        description: '',
-        features: [],
-        price: '',
-        pricing: {
-          paymentOptions: ['Paiement échelonné sur 12 mois ou 24 mois ou 36 mois', 'Paiement au comptant']
-        },
-        subscription: {
-          channels: ['La Direction Marché Entreprises', 'Les Espaces Entreprises', 'Réseaux de distribution indirecte']
-        }
-      }
-    };
-    this.featuresInput = '';
-    this.objectivesInput = '';
-    this.showOfferModal = true;
+  // Clear category filter
+  clearCategoryFilter() {
+    this.router.navigate(['/offrelist'], { queryParams: {} });
   }
+
+ // Open modal to add a new offer
+openAddOfferModal() {
+  this.editMode = false;
+  this.currentOffer = {
+    id: 0,
+    title: '',
+    description: '',
+    imageUrl: '',
+    offreType: '', 
+    popular: false,
+    details: {
+      objectives: [],
+      description: '',
+      features: [],
+      price: '',
+      pricing: {
+        paymentOptions: ['Paiement échelonné sur 12 mois ou 24 mois ou 36 mois', 'Paiement au comptant']
+      },
+      subscription: {
+        channels: ['La Direction Marché Entreprises', 'Les Espaces Entreprises', 'Réseaux de distribution indirecte']
+      }
+    }
+  };
+  this.featuresInput = '';
+  this.objectivesInput = '';
+  this.showOfferModal = true;
+}
 
   // Open modal to edit an existing offer
   editOffer(offer: Offer, event: Event) {
@@ -156,16 +218,32 @@ export class OffreListComponent implements OnInit {
     }
 
     if (this.editMode) {
-      this.offerService.updateOffer(this.currentOffer);
-      this.loadOffers(); // Refresh the list
-      this.closeOfferModal();
+      const sub = this.offerService.updateOffer(this.currentOffer).subscribe({
+        next: () => {
+          this.loadOffers(); // Refresh the list
+          this.closeOfferModal();
+        },
+        error: error => {
+          console.error('Error updating offer:', error);
+          alert('Failed to update offer. Please try again.');
+        }
+      });
+      this.subscriptions.push(sub);
     } else {
       // For a new offer, we use the addOffer method from your service
       // We need to omit the id as it will be generated
       const { id, ...offerWithoutId } = this.currentOffer;
-      this.offerService.addOffer(offerWithoutId);
-      this.loadOffers(); // Refresh the list
-      this.closeOfferModal();
+      const sub = this.offerService.addOffer(offerWithoutId).subscribe({
+        next: () => {
+          this.loadOffers(); // Refresh the list
+          this.closeOfferModal();
+        },
+        error: error => {
+          console.error('Error adding offer:', error);
+          alert('Failed to add offer. Please try again.');
+        }
+      });
+      this.subscriptions.push(sub);
     }
   }
 
@@ -181,9 +259,18 @@ export class OffreListComponent implements OnInit {
   // Delete offer after confirmation
   deleteOfferConfirmed() {
     if (this.offerToDelete) {
-      this.offerService.deleteOffer(this.offerToDelete.id);
-      this.loadOffers(); // Refresh the list
-      this.cancelDelete();
+      const sub = this.offerService.deleteOffer(this.offerToDelete.id).subscribe({
+        next: () => {
+          this.loadOffers(); // Refresh the list
+          this.cancelDelete();
+        },
+        error: error => {
+          console.error('Error deleting offer:', error);
+          alert('Failed to delete offer. Please try again.');
+          this.cancelDelete();
+        }
+      });
+      this.subscriptions.push(sub);
     }
   }
 

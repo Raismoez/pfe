@@ -1,72 +1,67 @@
-<!-- HTML - catalogue.component.html -->
 <div class="catalogue">
-    <app-sidebar></app-sidebar>
+  <app-sidebar></app-sidebar>
+  
+  <main class="main-content">
+    <app-header></app-header>
     
-    <main class="main-content">
-      <app-header></app-header>
+    <!-- Main Category Carousel -->
+    <div class="carousel">
+      <!-- Carousel Slides -->
+      <div class="carousel-container">
+        <div *ngFor="let category of offerCategories; let i = index"
+             class="carousel-slide"
+             [class.active]="currentIndex === i"
+             [class.prev]="isPrevious(i)"
+             [class.next]="isNext(i)">
+          <div class="carousel-image-container">
+            <img [src]="category.imageUrl" [alt]="category.title" class="carousel-image">
+          </div>
+          <div class="carousel-content">
+            <h2 class="slide-title">{{ category.title }}</h2>
+            <p class="slide-description">{{ category.description }}</p>
+            <a [routerLink]="['/offrelist']" [queryParams]="{category: category.id}" class="btn-primary">Voir les {{ category.title }}</a>
+          </div>
+        </div>
+      </div>
       
-      <!-- Enhanced Carousel -->
-      <div class="carousel" >
-        <!-- Carousel Slides -->
-        <div class="carousel-container">
-          <div *ngFor="let offer of offers; let i = index"
-               class="carousel-slide"
-               [class.active]="currentIndex === i"
-               [class.prev]="isPrevious(i)"
-               [class.next]="isNext(i)">
-            <div class="carousel-image-container">
-              <img [src]="offer.imageUrl" [alt]="offer.title" class="carousel-image">
-            </div>
-            <div class="carousel-content">
-              <h2 class="slide-title">{{ offer.title }}</h2>
-              <p class="slide-description">{{ offer.description }}</p>
-              <a routerLink="/offrelist" class="btn-primary">Voir toutes les offres</a>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Controls -->
-        <button class="carousel-control prev" (click)="previousSlide()" aria-label="Slide précédente">
-          <span aria-hidden="true">❮</span>
-        </button>
-        <button class="carousel-control next" (click)="nextSlide()" aria-label="Slide suivante">
-          <span aria-hidden="true">❯</span>
-        </button>
-  
-        <!-- Progress Bar -->
-        <div class="carousel-progress">
-          <div class="progress-bar" [style.width]="(currentIndex / (offers.length - 1)) * 100 + '%'"></div>
-        </div>
-        
-        <!-- Indicators -->
-        <div class="carousel-indicators">
-          <button *ngFor="let offer of offers; let i = index"
-                  class="indicator"
-                  [class.active]="currentIndex === i"
-                  (click)="goToSlide(i)"
-                  [attr.aria-label]="'Aller à la slide ' + (i + 1)">
-          </button>
-        </div>
-  
-       
+      <!-- Controls -->
+      <button class="carousel-control prev" (click)="previousSlide()" aria-label="Slide précédente">
+        <span aria-hidden="true">❮</span>
+      </button>
+      <button class="carousel-control next" (click)="nextSlide()" aria-label="Slide suivante">
+        <span aria-hidden="true">❯</span>
+      </button>
+      
+      <!-- Progress Bar -->
+      <div class="carousel-progress">
+        <div class="progress-bar" [style.width]="(currentIndex / (offerCategories.length - 1)) * 100 + '%'"></div>
       </div>
-  
-      <!-- Featured Offers -->
-       
-      <div class="featured-offers">
-        <app-reservation></app-reservation>
-        <h2 class="section-title">Offres populaires</h2>
-        <div class="offers-grid">
-          <div *ngFor="let offer of offers" class="offer-card">
-            <img [src]="offer.imageUrl" [alt]="offer.title" class="offer-image">
-            <div class="offer-content">
-              <h3>{{ offer.title }}</h3>
-              <p>{{ offer.description }}</p>
-              <a [routerLink]="['/offredetail', offer.id]" class="btn-secondary">En savoir plus</a>
-
-            </div>
+      
+      <!-- Indicators -->
+      <div class="carousel-indicators">
+        <button *ngFor="let category of offerCategories; let i = index"
+                class="indicator"
+                [class.active]="currentIndex === i"
+                (click)="goToSlide(i)"
+                [attr.aria-label]="'Aller à la slide ' + (i + 1)">
+        </button>
+      </div>
+    </div>
+    
+    <!-- Featured Offers -->
+    <div class="featured-offers">
+      <app-reservation></app-reservation>
+      <h2 class="section-title">Offres populaires</h2>
+      <div class="offers-grid">
+        <div *ngFor="let offer of specificPopularOffers" class="offer-card">
+          <img [src]="offer.imageUrl" [alt]="offer.title" class="offer-image">
+          <div class="offer-content">
+            <h3>{{ offer.title }}</h3>
+            <p>{{ offer.description }}</p>
+            <a [routerLink]="['/offredetail', offer.id]" class="btn-secondary">En savoir plus</a>
           </div>
         </div>
       </div>
-    </main>
-  </div>
+    </div>
+  </main>
+</div>

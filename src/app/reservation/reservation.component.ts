@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HeaderComponent } from '../components/header/header.component';
-import { SidebarComponent } from '../components/sidebar/sidebar.component';
+
 
 // Interface pour la réservation
 interface ReservationRequest {
@@ -16,7 +15,7 @@ interface ReservationRequest {
 @Component({
   selector: 'app-reservation',
   standalone: true,
-  imports: [CommonModule, FormsModule, HeaderComponent, SidebarComponent],
+  imports: [CommonModule, FormsModule],
   templateUrl: './reservation.component.html',
   styleUrls: ['./reservation.component.css']
 })

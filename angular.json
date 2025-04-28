@@ -39,8 +39,7 @@
            "styles": [
             "src/custom-theme.scss",
             "src/assets/vendor/fontawesome-free/css/all.min.css",
-            "src/assets/css/sb-admin-2.min.css",
-            "node_modules/bootstrap-icons/font/bootstrap-icons.css"
+            "src/assets/css/sb-admin-2.min.css"
           ],
 "scripts": [
   "src/assets/vendor/jquery/jquery.min.js",

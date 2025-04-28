@@ -123,7 +123,7 @@ export class LoginComponent implements OnInit {
   }
   // Méthode pour rediriger en fonction du rôle
   private redirectBasedOnRole(role: number) {
-    console.log('redirect test')
+    
     setTimeout(() => {
       console.log('redirect by role')
     switch(role) {
