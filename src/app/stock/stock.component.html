@@ -2,6 +2,10 @@
 <main class="main-content">
   <app-header></app-header>
 <div class="dashboard-container">
+  <button class="reservation" [routerLink]="['/tableau-reservation']">
+        <i class="fas fa-calendar-check"></i>
+        Réservation
+      </button>
   <!-- Top Stats Cards -->
   <div class="stats-grid">
     <div class="stat-card">
@@ -75,7 +79,6 @@
         <i class="fas fa-plus"></i>
         Nouvel Article
       </button>
-      
      
       <app-notification></app-notification>
     </div>
@@ -89,6 +92,7 @@
           {{ stock.categorie }}
         </span>
         <div class="stock-actions">
+          
           <button class="action-btn edit" (click)="editStock(stock)">
             <i class="fas fa-edit"></i>
           </button>
@@ -259,4 +263,5 @@
     </div>
   </div>
 </div>
+
 </main>
