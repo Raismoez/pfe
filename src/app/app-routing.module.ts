@@ -14,13 +14,8 @@ import { OffreListComponent } from './offre-list/offre-list.component';
 import { CatalogueComponent } from './catalogue/catalogue.component';
 
 import { ReservationComponent } from './reservation/reservation.component';
-
-<<<<<<< HEAD
-
-=======
-import { OffreFormComponent } from './offre-form/offre-form.component';
 import { TableauReservationComponent } from './components/tableau-reservation/tableau-reservation.component';
->>>>>>> 1e51ad72053d5055825faea5f090b75a41a2a972
+
 
 
 

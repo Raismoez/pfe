@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-<<<<<<< HEAD
+
 
 
 // Interface pour la réservation
@@ -12,12 +12,12 @@ interface ReservationRequest {
   article: string; // Article au lieu de catalogue
   date: string;
 }
-=======
+
 import { HeaderComponent } from '../components/header/header.component';
 import { SidebarComponent } from '../components/sidebar/sidebar.component';
 import { Router } from '@angular/router';
 import { ReservationService, Reservation } from '../services/reservation.service';
->>>>>>> 1e51ad72053d5055825faea5f090b75a41a2a972
+
 
 @Component({
   selector: 'app-reservation',
