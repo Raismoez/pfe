@@ -116,11 +116,25 @@ export class OffreListComponent implements OnInit, OnDestroy {
     this.subscriptions.push(sub);
   }
 
-  // Filter offers by category
-  // Filter offers by category
+// Correction pour la méthode filterOffersByCategory
 filterOffersByCategory(offers: Offer[], category: string): Offer[] {
-  // Utiliser directement le champ offreType
-  return offers.filter(offer => offer.offreType === category);
+
+  // Vérification de la présence du champ offreType
+  const filteredOffers = offers.filter(offer => {
+
+    if (!offer.offreType && category === 'corporate-vpn') {
+      // Si le titre contient "Corporate VPN", considérer comme appartenant à la catégorie
+      return offer.title.includes('Corporate VPN');
+    } else if (!offer.offreType && category === 'sd-wan') {
+      // Si le titre contient "SD-WAN", considérer comme appartenant à la catégorie
+      return offer.title.includes('SD-WAN');
+    }
+    
+    return offer.offreType === category;
+  });
+  
+  console.log('Filtered offers:', filteredOffers);
+  return filteredOffers;
 }
 
   // Search function
