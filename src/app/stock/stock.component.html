@@ -2,7 +2,7 @@
 <main class="main-content">
   <app-header></app-header>
 <div class="dashboard-container">
-  <button class="reservation" [routerLink]="['/tableau-reservation']">
+  <button *ngIf="isAdmin || isTechnicalAgent" class="reservation" [routerLink]="['/tableau-reservation']">
         <i class="fas fa-calendar-check"></i>
         Réservation
       </button>
@@ -75,12 +75,12 @@
         <option value="-quantite">Quantité (Décroissant)</option>
       </select>
       
-      <button class="btn-add" (click)="openAddStockModal()">
+      <button *ngIf="isAdmin || isTechnicalAgent" class="btn-add" (click)="openAddStockModal()">
         <i class="fas fa-plus"></i>
         Nouvel Article
       </button>
      
-      <app-notification></app-notification>
+      <app-notification *ngIf="isAdmin || isTechnicalAgent"></app-notification>
     </div>
   </div>
 
@@ -93,10 +93,10 @@
         </span>
         <div class="stock-actions">
           
-          <button class="action-btn edit" (click)="editStock(stock)">
+          <button *ngIf="isAdmin || isTechnicalAgent" class="action-btn edit" (click)="editStock(stock)">
             <i class="fas fa-edit"></i>
           </button>
-          <button class="action-btn delete" (click)="confirmDelete(stock)">
+          <button *ngIf="isAdmin || isTechnicalAgent" class="action-btn delete" (click)="confirmDelete(stock)">
             <i class="fas fa-trash"></i>
           </button>
         </div>

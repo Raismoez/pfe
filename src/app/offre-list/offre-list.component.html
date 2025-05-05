@@ -15,7 +15,7 @@
                  name="searchQuery"
                  (input)="onSearch()">
         </div>
-        <button class="btn primary" (click)="openAddOfferModal()">
+        <button *ngIf="isAdmin || isCommercialAgent" class="btn primary" (click)="openAddOfferModal()">
           <i class="fas fa-plus-circle"></i> Ajouter une offre
         </button>
       </div>
@@ -48,10 +48,10 @@
             </button>
             
             <div class="admin-actions">
-              <button class="btn icon-btn" (click)="editOffer(offer, $event)">
+              <button *ngIf="isAdmin || isCommercialAgent"class="btn icon-btn" (click)="editOffer(offer, $event)">
                 <i class="fas fa-edit"></i>
               </button>
-              <button class="btn icon-btn danger" (click)="confirmDelete(offer, $event)">
+              <button *ngIf="isAdmin || isCommercialAgent"class="btn icon-btn danger" (click)="confirmDelete(offer, $event)">
                 <i class="fas fa-trash"></i>
               </button>
             </div>

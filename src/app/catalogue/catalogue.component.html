@@ -50,7 +50,7 @@
     
     <!-- Featured Offers -->
     <div class="featured-offers">
-      <app-reservation></app-reservation>
+      <app-reservation *ngIf="isAdmin || isCommercialAgent"></app-reservation>
       <h2 class="section-title">Offres populaires</h2>
       <div class="offers-grid">
         <div *ngFor="let offer of specificPopularOffers" class="offer-card">

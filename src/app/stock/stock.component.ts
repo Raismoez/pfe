@@ -73,6 +73,17 @@ export class StockComponent implements OnInit, OnDestroy {
   currentPage: number = 1;
   itemsPerPage: number = 8;
   totalPages: number = 1;
+
+  public user: any;
+  public isAdmin: boolean = false;
+  public isCommercialAgent: boolean = false;
+  public isTechnicalAgent: boolean = false;
+  
+  // Role constants from login component
+  private readonly ROLE_ADMIN = 1;
+  private readonly ROLE_AGENT_COMMERCIAL = 2;
+  private readonly ROLE_AGENT_TECHNIQUE = 3;
+
   
   constructor(
     private router: Router, 
@@ -103,6 +114,16 @@ export class StockComponent implements OnInit, OnDestroy {
     // Initialiser la date de réservation à aujourd'hui
     const today = new Date();
     this.reservationDate = today.toISOString().split('T')[0];
+    
+    this.user = JSON.parse(sessionStorage.getItem("user") || '{}');
+    
+    // Get role from localStorage (as a fallback if user object doesn't have role)
+    const roleId = this.user.idRole || parseInt(localStorage.getItem('idRole') || '0');
+    
+    // Set role flags
+    this.isAdmin = roleId === this.ROLE_ADMIN;
+    this.isCommercialAgent = roleId === this.ROLE_AGENT_COMMERCIAL;
+    this.isTechnicalAgent = roleId === this.ROLE_AGENT_TECHNIQUE;
   }
   
   ngOnDestroy() {
