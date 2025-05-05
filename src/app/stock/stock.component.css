@@ -599,6 +599,11 @@
   font-size: 14px;
   font-weight: 500;
   transition: all 0.3s;
+  
+}
+.btn.primary{
+  background-color:#4154f1;
+  color: white;
 }
 .modal-content p{
   font-style: italic; 
