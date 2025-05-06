@@ -140,21 +140,23 @@ export class TableauReservationComponent implements OnInit {
     const reservation = this.filteredReservationData[index];
     if (!reservation.id) return;
 
-    // Afficher une confirmation si on annule
     if (newStatus === 'ANNULEE') {
-      const confirmation = window.confirm("Voulez-vous vraiment annuler cette réservation ?");
-      if (!confirmation) return;
-
-      this.reservationService.deleteReservation(reservation.id).subscribe({
+      this.reservationService.cancelReservation(reservation.id).subscribe({
         next: () => {
-          this.reservationData = this.reservationData.filter(r => r.id !== reservation.id);
-          this.filteredData = this.filteredData.filter(r => r.id !== reservation.id);
-          this.updatePagination();
-          this.showSuccessMessage = true;
-          setTimeout(() => this.showSuccessMessage = false, 3000);
+          this.reservationService.deleteReservation(reservation.id!).subscribe({
+            next: () => {
+              this.reservationData = this.reservationData.filter(r => r.id !== reservation.id);
+              this.filteredData = this.filteredData.filter(r => r.id !== reservation.id);
+              this.filteredReservationData = this.filteredReservationData.filter(r => r.id !== reservation.id);
+              this.updatePagination();
+            },
+            error: (err: any) => {
+              console.error("Erreur lors de la suppression :", err);
+            }
+          });
         },
         error: (err: any) => {
-          console.error("Erreur lors de la suppression :", err);
+          console.error("Erreur lors de l'annulation :", err);
         }
       });
     } else {
@@ -167,7 +169,6 @@ export class TableauReservationComponent implements OnInit {
         next: (updated: Reservation) => {
           this.filteredReservationData[index].status = updated.status;
 
-          // Si la réservation est confirmée, envoyer l'email de confirmation
           if (newStatus === 'CONFIRMEE') {
             this.reservationService.confirmReservation(reservation.id!).subscribe({
               next: () => {

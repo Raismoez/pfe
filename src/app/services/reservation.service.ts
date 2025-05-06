@@ -17,63 +17,53 @@ export interface Reservation {
   providedIn: 'root'
 })
 export class ReservationService {
-
+  
   private apiUrl = 'http://localhost:8080/api/reservations';
-
+  
   constructor(private http: HttpClient) { }
-
+  
   // Créer une nouvelle réservation
   createReservation(reservation: Reservation): Observable<Reservation> {
     return this.http.post<Reservation>(this.apiUrl, reservation);
   }
-
+  
   // Obtenir toutes les réservations
   getAllReservations(): Observable<Reservation[]> {
     return this.http.get<Reservation[]>(this.apiUrl);
   }
-
+  
   // Obtenir une réservation par ID
   getReservationById(id: number): Observable<Reservation> {
     return this.http.get<Reservation>(`${this.apiUrl}/${id}`);
   }
-
+  
   // Mettre à jour une réservation
   updateReservation(id: number, reservation: Reservation): Observable<Reservation> {
     return this.http.put<Reservation>(`${this.apiUrl}/${id}`, reservation);
   }
-
+  
   // Supprimer une réservation
   deleteReservation(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
-
+  
   // Confirmer une réservation
   confirmReservation(id: number): Observable<Reservation> {
-    const agentEmail = 'meriamdaadaa8@gmail.com'; 
+    const agentEmail = 'meriamdaadaa8@gmail.com';
     return this.http.patch<Reservation>(`${this.apiUrl}/${id}/confirm?email=${agentEmail}`, {});
   }
-  
-  
+       
   // Annuler une réservation
   cancelReservation(id: number): Observable<Reservation> {
-    return this.http.patch<Reservation>(`${this.apiUrl}/${id}/cancel`, {});
+    const agentEmail = 'meriamdaadaa8@gmail.com';
+    return this.http.patch<Reservation>(`${this.apiUrl}/${id}/cancel?email=${agentEmail}`, {});
   }
-
+  
   // Obtenir les réservations par statut
   getReservationsByStatus(status: 'EN_ATTENTE' | 'CONFIRMEE' | 'ANNULEE'): Observable<Reservation[]> {
     return this.http.get<Reservation[]>(`${this.apiUrl}/status/${status}`);
   }
-
-  // Obtenir les réservations par constructeur
-  getReservationsByConstructeur(constructeur: string): Observable<Reservation[]> {
-    return this.http.get<Reservation[]>(`${this.apiUrl}/constructeur/${constructeur}`);
-  }
-
-  // Obtenir les réservations par catégorie
-  getReservationsByCategorie(categorie: string): Observable<Reservation[]> {
-    return this.http.get<Reservation[]>(`${this.apiUrl}/categorie/${categorie}`);
-  }
-
+  
   //  Envoyer l'email de confirmation après confirmation côté back
   sendConfirmationMail(id: number): Observable<void> {
     return this.http.post<void>(`${this.apiUrl}/${id}/sendMail`, null);
