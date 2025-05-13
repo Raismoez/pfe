@@ -453,26 +453,36 @@ this.dashboardService.getManufacturerDistribution().subscribe(manufacturerData =
 
   // Helper method to find article by ID with partial matching
   getArticleById(articleId: string): StockItem | undefined {
-    // Try exact match first
-    let article = this.stockData.find(item => 
-      item.article.toLowerCase() === articleId.toLowerCase()
-    );
-    
-    // If exact match fails, try partial match with more flexibility
-    if (!article) {
-      article = this.stockData.find(item => {
-        const itemClean = item.article.toLowerCase().replace(/[-\s]/g, '');
-        const searchClean = articleId.toLowerCase().replace(/[-\s]/g, '');
-        return itemClean.includes(searchClean) || searchClean.includes(itemClean);
-      });
-    }
-    
-    if (!article) {
-      console.warn(`Could not find article data for ${articleId}`);
-    }
-    
-    return article;
+  console.log(`Recherche de l'article: ${articleId}`);
+  
+  // Try exact match first
+  let article = this.stockData.find(item => 
+    item.article.toLowerCase() === articleId.toLowerCase()
+  );
+  
+  // If exact match fails, try partial match with more flexibility
+  if (!article) {
+    article = this.stockData.find(item => {
+      const itemClean = item.article.toLowerCase().replace(/[-\s]/g, '');
+      const searchClean = articleId.toLowerCase().replace(/[-\s]/g, '');
+      
+      // Gérer spécifiquement le cas pour AR617VW-LTE
+      if (articleId.includes('AR617VW-LTE') && item.article.includes('AR617VW-LTE')) {
+        return true;
+      }
+      
+      return itemClean.includes(searchClean) || searchClean.includes(itemClean);
+    });
   }
+  
+  if (!article) {
+    console.warn(`Could not find article data for ${articleId}`);
+  } else {
+    console.log(`Article trouvé: ${article.article}`);
+  }
+  
+  return article;
+}
 
   // Helper method to get article history data
   getArticleHistoryData(article: StockItem): number[] {

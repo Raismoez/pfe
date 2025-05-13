@@ -19,7 +19,7 @@ export class OffreListComponent implements OnInit, OnDestroy {
   filteredOffers: Offer[] = [];
   searchQuery: string = '';
   categoryFilter: string = '';
-  categoryTitle: string = 'Toutes les offres';
+  categoryTitle: string = '';
   
   // Modal management
   showOfferModal: boolean = false;
@@ -29,6 +29,7 @@ export class OffreListComponent implements OnInit, OnDestroy {
     title: '',
     description: '',
     imageUrl: '',
+    offreType: '', // S'assurer que offreType est initialisé ici
     popular: false,
     details: {
       objectives: [],
@@ -62,14 +63,11 @@ export class OffreListComponent implements OnInit, OnDestroy {
   private readonly ROLE_AGENT_TECHNIQUE = 3;
   private subscriptions: Subscription[] = [];
   
-  
-
   constructor(
     private offerService: OfferService,
     private router: Router,
     private route: ActivatedRoute
   ) {}
-
 
   ngOnInit() {
     // Subscribe to route query params to get the category filter
@@ -82,9 +80,7 @@ export class OffreListComponent implements OnInit, OnDestroy {
           this.categoryTitle = 'Offres Corporate VPN';
         } else if (this.categoryFilter === 'sd-wan') {
           this.categoryTitle = 'Offres SD-WAN';
-        } else {
-          this.categoryTitle = 'Toutes les offres';
-        }
+        } 
         
         this.loadOffers();
       })
@@ -116,6 +112,9 @@ export class OffreListComponent implements OnInit, OnDestroy {
           this.filteredOffers = [...this.offers];
         }
         
+        console.log('Offers loaded:', this.offers);
+        console.log('Filtered offers:', this.filteredOffers);
+        
         // Add animation after data loads
         setTimeout(() => {
           const cards = document.querySelectorAll('.offer-card');
@@ -134,26 +133,32 @@ export class OffreListComponent implements OnInit, OnDestroy {
     this.subscriptions.push(sub);
   }
 
-// Correction pour la méthode filterOffersByCategory
-filterOffersByCategory(offers: Offer[], category: string): Offer[] {
-
-  // Vérification de la présence du champ offreType
-  const filteredOffers = offers.filter(offer => {
-
-    if (!offer.offreType && category === 'corporate-vpn') {
-      // Si le titre contient "Corporate VPN", considérer comme appartenant à la catégorie
-      return offer.title.includes('Corporate VPN');
-    } else if (!offer.offreType && category === 'sd-wan') {
-      // Si le titre contient "SD-WAN", considérer comme appartenant à la catégorie
-      return offer.title.includes('SD-WAN');
-    }
+  // Correction de la méthode filterOffersByCategory
+  filterOffersByCategory(offers: Offer[], category: string): Offer[] {
+    console.log('Filtering by category:', category);
+    console.log('Before filtering:', offers);
     
-    return offer.offreType === category;
-  });
-  
-  console.log('Filtered offers:', filteredOffers);
-  return filteredOffers;
-}
+    const filteredOffers = offers.filter(offer => {
+      // Vérifier si offreType correspond à la catégorie
+      if (offer.offreType === category) {
+        return true;
+      }
+      
+      // Fallback pour la compatibilité avec les anciennes données
+      if (!offer.offreType) {
+        if (category === 'corporate-vpn' && offer.title.toLowerCase().includes('corporate vpn')) {
+          return true;
+        } else if (category === 'sd-wan' && offer.title.toLowerCase().includes('sd-wan')) {
+          return true;
+        }
+      }
+      
+      return false;
+    });
+    
+    console.log('After filtering:', filteredOffers);
+    return filteredOffers;
+  }
 
   // Search function
   onSearch() {
@@ -183,8 +188,7 @@ filterOffersByCategory(offers: Offer[], category: string): Offer[] {
     this.router.navigate(['/offrelist'], { queryParams: {} });
   }
 
- // Open modal to add a new offer
-openAddOfferModal() {
+ openAddOfferModal() {
   this.editMode = false;
   this.currentOffer = {
     id: 0,
@@ -203,14 +207,16 @@ openAddOfferModal() {
       },
       subscription: {
         channels: ['La Direction Marché Entreprises', 'Les Espaces Entreprises', 'Réseaux de distribution indirecte']
-      }
+      },
+      solutionCisco: '',
+      solutionHuawei: '',
+      solutionFortinet: ''
     }
   };
   this.featuresInput = '';
   this.objectivesInput = '';
   this.showOfferModal = true;
 }
-
   // Open modal to edit an existing offer
   editOffer(offer: Offer, event: Event) {
     event.preventDefault();
@@ -239,6 +245,15 @@ openAddOfferModal() {
     } else {
       this.currentOffer.details.features = [];
     }
+    if (!this.currentOffer.details.solutionCisco) {
+      this.currentOffer.details.solutionCisco = '';
+    }
+    if (!this.currentOffer.details.solutionHuawei) {
+      this.currentOffer.details.solutionHuawei = '';
+    }
+    if (!this.currentOffer.details.solutionFortinet) {
+      this.currentOffer.details.solutionFortinet = '';
+    }
 
     if (this.objectivesInput) {
       this.currentOffer.details.objectives = this.objectivesInput
@@ -249,9 +264,13 @@ openAddOfferModal() {
       this.currentOffer.details.objectives = [];
     }
 
+    // S'assurer que offreType est correctement traité
+    console.log('Offer before submit:', this.currentOffer);
+
     if (this.editMode) {
-      const sub = this.offerService.updateOffer(this.currentOffer).subscribe({
+      const sub = this.offerService.updateOffer(this.currentOffer.id, this.currentOffer).subscribe({
         next: () => {
+          console.log('Offer updated successfully');
           this.loadOffers(); // Refresh the list
           this.closeOfferModal();
         },
@@ -265,8 +284,12 @@ openAddOfferModal() {
       // For a new offer, we use the addOffer method from your service
       // We need to omit the id as it will be generated
       const { id, ...offerWithoutId } = this.currentOffer;
+      
+      console.log('Adding new offer:', offerWithoutId);
+      
       const sub = this.offerService.addOffer(offerWithoutId).subscribe({
-        next: () => {
+        next: (newOffer) => {
+          console.log('Offer added successfully:', newOffer);
           this.loadOffers(); // Refresh the list
           this.closeOfferModal();
         },

@@ -8,21 +8,25 @@ export interface Offer {
   title: string;
   description: string;
   imageUrl: string;
-  offreType?: string; 
-  popular?: boolean;
+  offreType: string;
+  popular: boolean;
   details: {
     objectives: string[];
     description: string;
     features: string[];
-    price?: string;
-    pricing?: {
+    price: string;
+    pricing: {
       paymentOptions: string[];
     };
-    subscription?: {
+    subscription: {
       channels: string[];
     };
+    solutionCisco?: string;
+    solutionHuawei?: string;
+    solutionFortinet?: string;
   };
 }
+
 @Injectable({
   providedIn: 'root'
 })
@@ -45,11 +49,14 @@ export class OfferService {
         catchError(this.handleError)
       )
       .subscribe(offers => {
+        console.log('Loaded offers from server:', offers);
         this.offersSubject.next(offers);
       });
   }
 
   getOffers(): Observable<Offer[]> {
+    // Refresh offers from server before returning
+    this.loadOffers();
     return this.offers$;
   }
 
@@ -71,32 +78,31 @@ export class OfferService {
 
   addOffer(offer: Omit<Offer, 'id'>): Observable<Offer> {
     const requestPayload = this.prepareOfferForRequest(offer);
+    console.log('Sending to server:', requestPayload);
     
     return this.http.post<any>(this.apiUrl, requestPayload)
       .pipe(
         map(response => this.mapResponseToOffer(response)),
         tap(newOffer => {
-          const currentOffers = this.offersSubject.value;
-          this.offersSubject.next([...currentOffers, newOffer]);
+          console.log('Server response for new offer:', newOffer);
+          // Force reload from server
+          this.loadOffers();
         }),
         catchError(this.handleError)
       );
   }
 
-  updateOffer(updatedOffer: Offer): Observable<Offer> {
+  updateOffer(id: number, updatedOffer: Offer): Observable<Offer> {
     const requestPayload = this.prepareOfferForRequest(updatedOffer);
+    console.log('Updating offer, sending to server:', requestPayload);
 
-    return this.http.put<any>(`${this.apiUrl}/${updatedOffer.id}`, requestPayload)
+    return this.http.put<any>(`${this.apiUrl}/${id}`, requestPayload)
       .pipe(
         map(response => this.mapResponseToOffer(response)),
         tap(updated => {
-          const currentOffers = this.offersSubject.value;
-          const index = currentOffers.findIndex(o => o.id === updated.id);
-          if (index !== -1) {
-            const newOffers = [...currentOffers];
-            newOffers[index] = updated;
-            this.offersSubject.next(newOffers);
-          }
+          console.log('Server response for updated offer:', updated);
+          // Force reload from server
+          this.loadOffers();
         }),
         catchError(this.handleError)
       );
@@ -107,8 +113,8 @@ export class OfferService {
       .pipe(
         map(response => response.deleted || true),
         tap(_ => {
-          const currentOffers = this.offersSubject.value;
-          this.offersSubject.next(currentOffers.filter(offer => offer.id !== id));
+          // Force reload from server
+          this.loadOffers();
         }),
         catchError(this.handleError)
       );
@@ -121,7 +127,7 @@ export class OfferService {
       title: data.title,
       description: data.description,
       imageUrl: data.imageUrl,
-      offreType: data.offreType, 
+      offreType: data.offreType, // Assurez-vous que ce champ est bien mappé
       popular: data.popular || false,
       details: {
         objectives: data.objectives || [],
@@ -133,7 +139,10 @@ export class OfferService {
         },
         subscription: {
           channels: data.subscriptionChannels || []
-        }
+        },
+        solutionCisco: data.solutionCisco || '',
+        solutionFortinet: data.solutionFortinet || '',
+        solutionHuawei: data.solutionHuawei || ''
       }
     };
   }
@@ -150,14 +159,17 @@ export class OfferService {
       title: offer.title,
       description: offer.description,
       imageUrl: offer.imageUrl,
-      offreType: offer.offreType, // Ajout du champ offreType
+      offreType: offer.offreType, // S'assurer que ce champ est bien inclus
       popular: offer.popular,
       objectives: offer.details.objectives || [],
       detailsDescription: offer.details.description,
       features: offer.details.features || [],
       prix: offer.details.price || '',
       paymentOptions: offer.details.pricing?.paymentOptions || [],
-      subscriptionChannels: offer.details.subscription?.channels || []
+      subscriptionChannels: offer.details.subscription?.channels || [],
+      solutionCisco: offer.details.solutionCisco || '',
+      solutionFortinet: offer.details.solutionFortinet || '',
+      solutionHuawei: offer.details.solutionHuawei || ''
     };
   }
 

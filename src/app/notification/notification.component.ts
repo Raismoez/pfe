@@ -12,6 +12,9 @@ import { NotificationService, NotificationRequest } from '../services/notificati
 })
 export class NotificationComponent implements OnInit {
   showNotificationModal: boolean = false;
+  showSuccessMessage: boolean = false;
+  successMessage: string = '';
+  errorMessage: string = '';
   
   notificationSettings: NotificationRequest = {
     recipients: '',
@@ -70,11 +73,24 @@ export class NotificationComponent implements OnInit {
     const hasValidRecipients = this.notificationSettings.recipients.trim() !== '';
     
     // Vérifier l'heure programmée si pas d'envoi immédiat
-    const hasValidSchedule = this.notificationSettings.sendNow ||
+    const hasValidSchedule = this.notificationSettings.sendNow || 
      (this.notificationSettings.scheduleTime !== null && 
-      this.notificationSettings.scheduleTime !== '');
+       this.notificationSettings.scheduleTime !== '');
     
     return hasValidRecipients && hasValidSchedule && anyTypeSelected && this.notificationSettings.subject.trim() !== '';
+  }
+  
+  
+
+  // Méthode pour l'affichage des messages de succès
+  showSuccessNotification(message: string): void {
+    this.successMessage = message;
+    this.showSuccessMessage = true;
+    
+    // Cacher le message après 3 secondes
+    setTimeout(() => {
+      this.showSuccessMessage = false;
+    }, 3000);
   }
   
   // Envoyer une notification
@@ -95,14 +111,26 @@ export class NotificationComponent implements OnInit {
       next: (response) => {
         console.log('Notification sent successfully:', response);
         this.closeNotificationModal();
-        alert(this.notificationSettings.sendNow ?
-             'Notification envoyée avec succès!' :
-             'Notification programmée avec succès!');
+        
+        // Utiliser la nouvelle méthode pour afficher le message de succès
+        const message = this.notificationSettings.sendNow ? 
+          'Notification envoyée avec succès!' : 
+          'Notification programmée avec succès!';
+        this.showSuccessNotification(message);
       },
       error: (error) => {
         console.error('Error sending notification:', error);
-        alert(`Erreur: ${error.error?.message || 'Une erreur est survenue lors de l\'envoi de la notification'}`);
+        this.closeNotificationModal();
+        
+      
       }
     });
   }
+  
+  // Fermer les messages de notification
+  closeSuccessMessage() {
+    this.showSuccessMessage = false;
+  }
+  
+
 }

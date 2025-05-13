@@ -61,8 +61,88 @@
         </div>
       </div>
 
+    <!-- Solution Cisco card -->
+<div class="card solution-card" *ngIf="isAdmin || isTechnicalAgent || isCommercialAgent || (offer.details.solutionCisco && offer.details.solutionCisco.trim() !== '')">
+  <div class="card-header">
+    <i class="bi bi-shield-check"></i>
+    <h3>Solution Cisco</h3>
+    <button *ngIf="isAdmin || isTechnicalAgent" class="btn icon-btn edit-solution-btn" (click)="editSolution('cisco')">
+      <i class="bi bi-pencil-square"></i>
+    </button>
+  </div>
+  <div class="card-body">
+    <ul class="solution-list" *ngIf="offer.details.solutionCisco && offer.details.solutionCisco.trim() !== ''">
+      <ng-container *ngFor="let line of formatSolution(offer.details.solutionCisco)">
+        <li class="solution-item">
+          <i class="bi bi-check-circle"></i>
+          <span>{{ line }}</span>
+        </li>
+      </ng-container>
+    </ul>
+    <p *ngIf="!offer.details.solutionCisco || offer.details.solutionCisco.trim() === ''">
+      <i>Aucune information sur la solution Cisco n'est disponible pour le moment.</i><br>
+      <span *ngIf="isAdmin || isTechnicalAgent"> Cliquez sur l'icône de modification pour ajouter des détails.</span>
+    </p>
+  </div>
+</div>
+
+<!-- Solution Huawei card -->
+<div class="card solution-card" *ngIf="isAdmin || isTechnicalAgent || isCommercialAgent || (offer.details.solutionHuawei && offer.details.solutionHuawei.trim() !== '')">
+  <div class="card-header">
+    <i class="bi bi-shield-check"></i>
+    <h3>Solution Huawei</h3>
+    <button *ngIf="isAdmin || isTechnicalAgent" class="btn icon-btn edit-solution-btn" (click)="editSolution('huawei')">
+      <i class="bi bi-pencil-square"></i>
+    </button>
+  </div>
+  <div class="card-body">
+    <ul class="solution-list" *ngIf="offer.details.solutionHuawei && offer.details.solutionHuawei.trim() !== ''">
+      <ng-container *ngFor="let line of formatSolution(offer.details.solutionHuawei)">
+        <li class="solution-item">
+          <i class="bi bi-check-circle"></i>
+          <span>{{ line }}</span>
+        </li>
+      </ng-container>
+    </ul>
+    <p *ngIf="!offer.details.solutionHuawei || offer.details.solutionHuawei.trim() === ''">
+      <i>Aucune information sur la solution Huawei n'est disponible pour le moment.</i><br>
+      <span *ngIf="isAdmin || isTechnicalAgent"> Cliquez sur l'icône de modification pour ajouter des détails.</span>
+    </p>
+  </div>
+</div>
+
+<!-- Solution Fortinet card -->
+<div class="card solution-card" *ngIf="isAdmin || isTechnicalAgent || isCommercialAgent || (offer.details.solutionFortinet && offer.details.solutionFortinet.trim() !== '')">
+  <div class="card-header">
+    <i class="bi bi-shield-check"></i>
+    <h3>Solution Fortinet</h3>
+    <button *ngIf="isAdmin || isTechnicalAgent" class="btn icon-btn edit-solution-btn" (click)="editSolution('fortinet')">
+      <i class="bi bi-pencil-square"></i>
+    </button>
+  </div>
+  <div class="card-body">
+    <ul class="solution-list" *ngIf="offer.details.solutionFortinet && offer.details.solutionFortinet.trim() !== ''">
+      <ng-container *ngFor="let line of formatSolution(offer.details.solutionFortinet)">
+        <li class="solution-item">
+          <i class="bi bi-check-circle"></i>
+          <span>{{ line }}</span>
+        </li>
+      </ng-container>
+    </ul>
+    <p *ngIf="!offer.details.solutionFortinet || offer.details.solutionFortinet.trim() === ''">
+      <i>Aucune information sur la solution Fortinet n'est disponible pour le moment.</i><br>
+      <span *ngIf="isAdmin || isTechnicalAgent"> Cliquez sur l'icône de modification pour ajouter des détails.</span>
+    </p>
+  </div>
+</div>
+
+
+
+
+
+
+    
      
-      
       <!-- Pricing card -->
       <div class="card pricing-card" *ngIf="offer.details.pricing && offer.details.pricing.paymentOptions">
         <div class="card-header">
@@ -75,10 +155,7 @@
             <li *ngFor="let option of offer.details.pricing.paymentOptions" class="pricing-item">
               <i class="bi bi-check-circle"></i>
               <span>{{ option }}</span>
-              
-              
             </li>
-            
           </ul>
         </div>
       </div>
@@ -102,11 +179,34 @@
     </div>
     
     <!-- Action buttons -->
-<div class="action-buttons">
-  <button class="btn back-btn" (click)="goBack()">
-    <i class="bi bi-arrow-left"></i> Retour aux offres {{ category ? (category === 'corporate-vpn' ? 'Corporate VPN' : 'SD-WAN') : '' }}
-  </button>
-</div>
+    <div class="action-buttons">
+      <button class="btn back-btn" (click)="goBack()">
+        <i class="bi bi-arrow-left"></i> Retour aux offres {{ category ? (category === 'corporate-vpn' ? 'Corporate VPN' : 'SD-WAN') : '' }}
+      </button>
+    </div>
     
+  </div>
+  
+  <!-- Modal d'édition de solution -->
+  <div class="modal" *ngIf="showSolutionModal">
+    <div class="modal-content">
+      <h2>Modifier la solution {{ currentSolutionType | titlecase }}</h2>
+      <form (ngSubmit)="onSubmitSolutionForm()">
+        <div class="info-group">
+          
+          <textarea 
+            [(ngModel)]="currentSolutionContent" 
+            name="solutionContent" 
+            rows="10" 
+            required></textarea>
+          <small>Entrez chaque élément sur une nouvelle ligne</small>
+        </div>
+
+        <div class="modal-buttons">
+          <button type="submit" class="btn primary">Enregistrer</button>
+          <button type="button" class="btn secondary" (click)="closeSolutionModal()">Annuler</button>
+        </div>
+      </form>
+    </div>
   </div>
 </main>

@@ -4,7 +4,7 @@
 
   <div class="offer-container">
     <div class="offer-header">
-      <h1>Nos Offres</h1>
+      <h1>{{ categoryTitle }}</h1>
       <p class="subtitle">Des solutions adaptées à vos besoins professionnels</p>
       
       <div class="page-header">
@@ -23,8 +23,6 @@
     
     <div class="offer-grid">
       <div *ngFor="let offer of filteredOffers" class="offer-card">
-       
-        
         <div class="card-img-container">
           <img [src]="offer.imageUrl" [alt]="offer.title">
           <div class="overlay"></div>
@@ -42,20 +40,22 @@
           </div>
           
           <div class="card-actions">
-            <button [routerLink]="['/offredetail', offer.id]" class="btn-primary">
-              <span>Découvrir</span>
-              <i class="fas fa-arrow-right"></i>
+           <button [routerLink]="['/offredetail', offer.id]" 
+            [queryParams]="{category: categoryFilter}" 
+            class="btn-primary">
+            <span>Découvrir</span>
+             <i class="fas fa-arrow-right"></i>
             </button>
-            
-            <div class="admin-actions">
-              <button *ngIf="isAdmin || isCommercialAgent"class="btn icon-btn" (click)="editOffer(offer, $event)">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button *ngIf="isAdmin || isCommercialAgent"class="btn icon-btn danger" (click)="confirmDelete(offer, $event)">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-          </div>
+    
+    <div class="admin-actions">
+      <button *ngIf="isAdmin || isCommercialAgent" class="btn icon-btn" (click)="editOffer(offer, $event)">
+        <i class="fas fa-edit"></i>
+      </button>
+      <button *ngIf="isAdmin || isCommercialAgent" class="btn icon-btn danger" (click)="confirmDelete(offer, $event)">
+        <i class="fas fa-trash"></i>
+      </button>
+    </div>
+  </div>
         </div>
       </div>
       
@@ -65,9 +65,8 @@
     </div>
     <div class="action-buttons">
       <a routerLink="/catalogue" class="btn back-btn">
-        <i class="bi bi-arrow-left "></i> Retour aux catalogue des offres
+        <i class="bi bi-arrow-left"></i> Retour aux catalogue des offres
       </a>
-      
     </div>
   </div>
 </main>
@@ -168,17 +167,10 @@
         ></textarea>
       </div>
 
-      <div class="info-group">
-        <label>Prix</label>
-        <input 
-          type="text" 
-          [(ngModel)]="currentOffer.details.price" 
-          name="price"
-        />
-      </div>
+     
 
       <div class="modal-buttons">
-        <button type="submit" class="btn primary" [disabled]="titleInput.invalid || descInput.invalid || imageInput.invalid">
+        <button type="submit" class="btn primary" [disabled]="titleInput.invalid || descInput.invalid || imageInput.invalid || offreTypeInput.invalid">
           {{ editMode ? 'Enregistrer' : 'Ajouter' }}
         </button>
         <button type="button" class="btn secondary" (click)="closeOfferModal()">Annuler</button>
@@ -187,7 +179,7 @@
   </div>
 </div>
 
-<!-- Modal de confirmation de suppression - Style mis à jour -->
+<!-- Modal de confirmation de suppression -->
 <div class="modal delete-modal" *ngIf="showDeleteConfirmation">
   <div class="modal-content">
     <h3>Confirmation de suppression</h3>

@@ -1,5 +1,4 @@
-
-@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css");
+ @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css");
 
 /* Main layout styles */
 .main-content {
@@ -210,9 +209,11 @@
 }
 
 .back-btn {
-  background-color: white;
-  color: #4154f1;
-  border: 2px solid #4154f1;
+    background-color: white;
+    color: #4154f1;
+    border: 2px solid #4154f1;
+    margin-top: 40px;
+    margin-left: 838px;
   
 }
 
@@ -254,4 +255,169 @@
     width: 100%;
     justify-content: center;
   }
+}
+/* Solution cards styling */
+.solution-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.solution-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.solution-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.solution-item i {
+  color: #4154f1;
+  font-size: 1.1rem;
+  margin-top: 0.1rem;
+  min-width: 20px;
+}
+
+
+.card-header {
+  background-color: #4154f1;
+  color: white;
+  padding: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.card-header i {
+  font-size: 1.4rem;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.card-body {
+  padding: 1.5rem;
+  height: calc(100% - 60px); /* Subtract header height */
+  display: flex;
+  flex-direction: column;
+}
+/* Styles du bouton d'édition */
+.edit-solution-btn {
+  margin-left: auto;
+  background-color: transparent;
+  color: white;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+}
+
+.edit-solution-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.edit-solution-btn i {
+  font-size: 1.2rem;
+}
+
+/* Style pour le header de la carte avec bouton d'édition */
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* Styles pour le modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  color: #4154f1;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.info-group {
+  margin-bottom: 1.5rem;
+}
+
+.info-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #444;
+}
+
+.info-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 1rem;
+  resize: vertical;
+}
+
+.info-group small {
+  display: block;
+  margin-top: 0.5rem;
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+
+
+.primary {
+  background-color: #4154f1;
+  color: white;
+}
+
+.primary:hover {
+  background-color: #3a4ad9;
+}
+
+.secondary {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.secondary:hover {
+  background-color: #e5e5e5;
 }
