@@ -62,6 +62,10 @@ export class OffreListComponent implements OnInit, OnDestroy {
   private readonly ROLE_AGENT_COMMERCIAL = 2;
   private readonly ROLE_AGENT_TECHNIQUE = 3;
   private subscriptions: Subscription[] = [];
+  showNotification: boolean = false;
+  notificationMessage: string = '';
+  notificationType: 'success' | 'error' | 'warning' = 'success';
+  notificationTimeout: any = null;
   
   constructor(
     private offerService: OfferService,
@@ -95,9 +99,33 @@ export class OffreListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    if (this.notificationTimeout) {
+    clearTimeout(this.notificationTimeout);
+  }
     // Clean up subscriptions to prevent memory leaks
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
+  showNotificationMessage(message: string, type: 'success' | 'error' | 'warning' = 'success', duration: number = 3000) {
+  // Annuler tout timeout existant
+  if (this.notificationTimeout) {
+    clearTimeout(this.notificationTimeout);
+  }
+  
+  // Définir le message et afficher la notification
+  this.notificationMessage = message;
+  this.notificationType = type;
+  this.showNotification = true;
+  
+  // Masquer automatiquement après la durée spécifiée
+  this.notificationTimeout = setTimeout(() => {
+    this.showNotification = false;
+  }, duration);
+}
+
+// Méthode d'aide pour extraire des messages d'erreur
+private getErrorMessage(error: any): string {
+  return error.error?.message || error.message || "Une erreur s'est produite";
+}
 
   // Load all offers and filter by category if needed
   loadOffers() {
@@ -270,13 +298,15 @@ export class OffreListComponent implements OnInit, OnDestroy {
     if (this.editMode) {
       const sub = this.offerService.updateOffer(this.currentOffer.id, this.currentOffer).subscribe({
         next: () => {
-          console.log('Offer updated successfully');
+          
           this.loadOffers(); // Refresh the list
+          this.showNotificationMessage(`L’offre "${this.currentOffer.title}" a été mise à jour avec succès.`, 'success');
           this.closeOfferModal();
         },
         error: error => {
-          console.error('Error updating offer:', error);
-          alert('Failed to update offer. Please try again.');
+          
+          this.showNotificationMessage(this.getErrorMessage(error), 'error');
+
         }
       });
       this.subscriptions.push(sub);
@@ -285,17 +315,19 @@ export class OffreListComponent implements OnInit, OnDestroy {
       // We need to omit the id as it will be generated
       const { id, ...offerWithoutId } = this.currentOffer;
       
-      console.log('Adding new offer:', offerWithoutId);
+      
       
       const sub = this.offerService.addOffer(offerWithoutId).subscribe({
         next: (newOffer) => {
           console.log('Offer added successfully:', newOffer);
           this.loadOffers(); // Refresh the list
+           this.showNotificationMessage(`L’offre "${newOffer.title}" a été ajoutée avec succès.`, 'success');
           this.closeOfferModal();
         },
         error: error => {
           console.error('Error adding offer:', error);
-          alert('Failed to add offer. Please try again.');
+          this.showNotificationMessage(this.getErrorMessage(error), 'error');
+
         }
       });
       this.subscriptions.push(sub);
@@ -317,11 +349,12 @@ export class OffreListComponent implements OnInit, OnDestroy {
       const sub = this.offerService.deleteOffer(this.offerToDelete.id).subscribe({
         next: () => {
           this.loadOffers(); // Refresh the list
+          this.showNotificationMessage(`L’offre "${this.offerToDelete?.title}" a été supprimée avec succès.`, 'success');
           this.cancelDelete();
         },
         error: error => {
           console.error('Error deleting offer:', error);
-          alert('Failed to delete offer. Please try again.');
+          this.showNotificationMessage(this.getErrorMessage(error), 'error');
           this.cancelDelete();
         }
       });
@@ -341,4 +374,5 @@ export class OffreListComponent implements OnInit, OnDestroy {
     event.stopPropagation();
     this.router.navigate(['/offer', id]);
   }
+  
 }

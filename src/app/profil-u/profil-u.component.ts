@@ -14,14 +14,13 @@ import { HeaderComponent } from '../components/header/header.component';
   styleUrls: ['./profil-u.component.css']
 })
 export class ProfilUComponent implements OnInit {
-  userProfile: any = {
+    userProfile: any = {
     identifiant: '',
     nomUtilisateur: '',
     email: '',
     role: '',
     avatarUrl: ''
   };
-  public user = JSON.parse(sessionStorage.getItem("user") || '{}');
 
   originalProfile: any = {};
   
@@ -30,10 +29,13 @@ export class ProfilUComponent implements OnInit {
   uploadingAvatar = false;
   showPasswordModal: boolean = false;
 
-  toast = {
-    show: false,
-    message: ''
-  };
+ 
+  
+  // Ajout des propriétés pour les messages de notification
+  showNotification: boolean = false;
+  notificationMessage: string = '';
+  notificationType: 'success' | 'error' | 'warning' = 'success';
+  notificationTimeout: any = null;
 
   currentPassword = '';
   newPassword = '';
@@ -46,6 +48,7 @@ export class ProfilUComponent implements OnInit {
   };
 
   selectedFile: File | null = null;
+  user: any;
 
   constructor(
     private router: Router,
@@ -65,32 +68,53 @@ export class ProfilUComponent implements OnInit {
     }
   }
   
+  ngOnDestroy() {
+    // Nettoyer le timeout de notification si existant
+    if (this.notificationTimeout) {
+      clearTimeout(this.notificationTimeout);
+    }
+  }
+
+  // Méthode pour afficher les notifications
+  showNotificationMessage(message: string, type: 'success' | 'error' | 'warning' = 'success', duration: number = 5000) {
+    // Annuler tout timeout existant
+    if (this.notificationTimeout) {
+      clearTimeout(this.notificationTimeout);
+      this.notificationTimeout = null;
+    }
+    
+    // Définir le message et afficher la notification
+    this.notificationMessage = message;
+    this.notificationType = type;
+    this.showNotification = true;
+    
+    console.log(`Notification affichée: "${message}" de type ${type} pour ${duration}ms`);
+    
+    // Masquer automatiquement après la durée spécifiée
+    if (duration > 0) {
+      this.notificationTimeout = setTimeout(() => {
+        console.log(`Fermeture de la notification: "${message}"`);
+        this.showNotification = false;
+      }, duration);
+    }
+  }
+  
   private apiBaseUrl = 'http://localhost:8080';
 
   loadUserProfile(identifiant: string) {
     console.log('Tentative de chargement du profil pour:', identifiant);
     this.profileService.getUserProfile(identifiant).subscribe({
       next: (data) => {
-        console.log('Profil chargé avec succès:', data);
-        
-        // Ensure avatar URL is properly formatted
-        let avatarUrl = data.avatarUrl || '';
-        // If the URL is not empty and doesn't start with http or data: (for preview)
-        if (avatarUrl && !avatarUrl.startsWith('http') && !avatarUrl.startsWith('data:')) {
-          // Ensure it has the full backend URL prefix
-          avatarUrl = `${this.apiBaseUrl}${avatarUrl.startsWith('/') ? '' : '/'}${avatarUrl}`;
-        }
-        
         this.userProfile = {
           ...data,
           role: this.getRoleName(data.idRole),
-          avatarUrl: avatarUrl
+          // avatarUrl: avatarUrl
         };
         this.originalProfile = {...this.userProfile};
       },
       error: (error) => {
         console.error('Erreur détaillée lors du chargement du profil:', error);
-        this.showMessage('Erreur lors du chargement du profil');
+        this.showNotificationMessage('Erreur lors du chargement du profil', 'error');
       }
     });
   }
@@ -112,6 +136,21 @@ export class ProfilUComponent implements OnInit {
       this.cancelEdit();
     }
   }
+  
+  togglePasswordModal() {
+    this.showPasswordModal = !this.showPasswordModal;
+    // Réinitialiser les erreurs et les champs si on ferme le modal
+    if (!this.showPasswordModal) {
+      this.currentPassword = '';
+      this.newPassword = '';
+      this.confirmPassword = '';
+      this.passwordError = {
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      };
+    }
+  }
 
   cancelEdit() {
     this.userProfile = {...this.originalProfile};
@@ -121,7 +160,7 @@ export class ProfilUComponent implements OnInit {
 
   onSubmit() {
     if (!this.userProfile.identifiant) {
-      this.showMessage('Identifiant non disponible');
+      this.showNotificationMessage('Identifiant non disponible', 'error');
       return;
     }
 
@@ -142,12 +181,17 @@ export class ProfilUComponent implements OnInit {
 
     this.profileService.updateUserProfile(this.userProfile.identifiant, updateData).subscribe({
       next: () => {
-        this.showMessage('Profil mis à jour avec succès');
+        this.showNotificationMessage('Profil mis à jour avec succès', 'success');
         this.originalProfile = {...this.userProfile};
         this.isEditing = false;
+        
+        // Attendre que la notification soit visible pendant quelques secondes avant de recharger la page
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000); // Recharge la page après 2 secondes
       },
       error: (error) => {
-        this.showMessage('Erreur lors de la mise à jour du profil');
+        this.showNotificationMessage('Erreur lors de la mise à jour du profil', 'error');
         console.error('Erreur de mise à jour:', error);
       }
     });
@@ -193,33 +237,23 @@ export class ProfilUComponent implements OnInit {
         }
         
         this.userProfile.avatarUrl = avatarUrl;
+        console.log(this.userProfile)
+        sessionStorage.removeItem('user');
+        sessionStorage.setItem('user',JSON.stringify(this.userProfile))
         this.uploadingAvatar = false;
         this.selectedFile = null;
         this.updateProfile();
+        
       },
       error: (error) => {
         console.error('Détails de l\'erreur de téléchargement:', error);
         console.error('Statut:', error.status);
         console.error('Message d\'erreur:', error.message);
         
-        this.showMessage('Erreur lors du téléchargement de l\'avatar');
+        this.showNotificationMessage('Erreur lors du téléchargement de l\'avatar', 'error');
         this.uploadingAvatar = false;
       }
     });
-  }
-  togglePasswordModal() {
-    this.showPasswordModal = !this.showPasswordModal;
-    // Réinitialiser les erreurs et les champs si on ferme le modal
-    if (!this.showPasswordModal) {
-      this.currentPassword = '';
-      this.newPassword = '';
-      this.confirmPassword = '';
-      this.passwordError = {
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
-      };
-    }
   }
 
   togglePasswordForm() {
@@ -286,27 +320,22 @@ export class ProfilUComponent implements OnInit {
 
     this.profileService.changePassword(this.userProfile.identifiant, passwordData).subscribe({
       next: () => {
-        this.showMessage('Mot de passe modifié avec succès');
-        this.togglePasswordForm();
+        this.showNotificationMessage('Mot de passe modifié avec succès', 'success');
+        this.togglePasswordModal();
       },
       error: (error) => {
         if (error.status === 401) {
           this.passwordError.currentPassword = 'Mot de passe actuel incorrect';
         } else {
-          this.showMessage('Erreur lors de la modification du mot de passe');
+          this.showNotificationMessage('Erreur lors de la modification du mot de passe', 'error');
         }
         console.error('Erreur de modification du mot de passe:', error);
       }
     });
   }
 
- 
-
+  
   showMessage(message: string) {
-    this.toast.message = message;
-    this.toast.show = true;
-    setTimeout(() => {
-      this.toast.show = false;
-    }, 3000);
+    this.showNotificationMessage(message, message.includes('Erreur') ? 'error' : 'success');
   }
 }

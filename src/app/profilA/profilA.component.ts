@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -9,11 +9,11 @@ import { HeaderComponent } from '../components/header/header.component';
 @Component({
   selector: 'app-profilA',
   standalone: true,
-  imports: [CommonModule, FormsModule,RouterModule,SidebarComponent,HeaderComponent],
+  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, HeaderComponent],
   templateUrl: './profilA.component.html',
   styleUrls: ['./profilA.component.css']
 })
-export class profilAComponent implements OnInit {
+export class profilAComponent implements OnInit, OnDestroy {
   userProfile: any = {
     identifiant: '',
     nomUtilisateur: '',
@@ -21,7 +21,6 @@ export class profilAComponent implements OnInit {
     role: '',
     avatarUrl: ''
   };
-  
 
   originalProfile: any = {};
   
@@ -30,10 +29,13 @@ export class profilAComponent implements OnInit {
   uploadingAvatar = false;
   showPasswordModal: boolean = false;
 
-  toast = {
-    show: false,
-    message: ''
-  };
+ 
+  
+  // Ajout des propriétés pour les messages de notification
+  showNotification: boolean = false;
+  notificationMessage: string = '';
+  notificationType: 'success' | 'error' | 'warning' = 'success';
+  notificationTimeout: any = null;
 
   currentPassword = '';
   newPassword = '';
@@ -53,7 +55,6 @@ export class profilAComponent implements OnInit {
     private profileService: ProfileService
   ) {}
 
-
   ngOnInit(): void {
     // Ajoutez des logs pour déboguer
     const identifiant = localStorage.getItem('identifiant');
@@ -67,14 +68,43 @@ export class profilAComponent implements OnInit {
     }
   }
   
+  ngOnDestroy() {
+    // Nettoyer le timeout de notification si existant
+    if (this.notificationTimeout) {
+      clearTimeout(this.notificationTimeout);
+    }
+  }
+
+  // Méthode pour afficher les notifications
+  showNotificationMessage(message: string, type: 'success' | 'error' | 'warning' = 'success', duration: number = 5000) {
+    // Annuler tout timeout existant
+    if (this.notificationTimeout) {
+      clearTimeout(this.notificationTimeout);
+      this.notificationTimeout = null;
+    }
+    
+    // Définir le message et afficher la notification
+    this.notificationMessage = message;
+    this.notificationType = type;
+    this.showNotification = true;
+    
+    console.log(`Notification affichée: "${message}" de type ${type} pour ${duration}ms`);
+    
+    // Masquer automatiquement après la durée spécifiée
+    if (duration > 0) {
+      this.notificationTimeout = setTimeout(() => {
+        console.log(`Fermeture de la notification: "${message}"`);
+        this.showNotification = false;
+      }, duration);
+    }
+  }
+  
   private apiBaseUrl = 'http://localhost:8080';
 
   loadUserProfile(identifiant: string) {
     console.log('Tentative de chargement du profil pour:', identifiant);
     this.profileService.getUserProfile(identifiant).subscribe({
       next: (data) => {
-       
-        
         this.userProfile = {
           ...data,
           role: this.getRoleName(data.idRole),
@@ -84,7 +114,7 @@ export class profilAComponent implements OnInit {
       },
       error: (error) => {
         console.error('Erreur détaillée lors du chargement du profil:', error);
-        this.showMessage('Erreur lors du chargement du profil');
+        this.showNotificationMessage('Erreur lors du chargement du profil', 'error');
       }
     });
   }
@@ -106,6 +136,7 @@ export class profilAComponent implements OnInit {
       this.cancelEdit();
     }
   }
+  
   togglePasswordModal() {
     this.showPasswordModal = !this.showPasswordModal;
     // Réinitialiser les erreurs et les champs si on ferme le modal
@@ -120,7 +151,6 @@ export class profilAComponent implements OnInit {
       };
     }
   }
-  
 
   cancelEdit() {
     this.userProfile = {...this.originalProfile};
@@ -130,7 +160,7 @@ export class profilAComponent implements OnInit {
 
   onSubmit() {
     if (!this.userProfile.identifiant) {
-      this.showMessage('Identifiant non disponible');
+      this.showNotificationMessage('Identifiant non disponible', 'error');
       return;
     }
 
@@ -151,13 +181,17 @@ export class profilAComponent implements OnInit {
 
     this.profileService.updateUserProfile(this.userProfile.identifiant, updateData).subscribe({
       next: () => {
-        this.showMessage('Profil mis à jour avec succès');
+        this.showNotificationMessage('Profil mis à jour avec succès', 'success');
         this.originalProfile = {...this.userProfile};
         this.isEditing = false;
-        window.location.reload()
+        
+        // Attendre que la notification soit visible pendant quelques secondes avant de recharger la page
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000); // Recharge la page après 2 secondes
       },
       error: (error) => {
-        this.showMessage('Erreur lors de la mise à jour du profil');
+        this.showNotificationMessage('Erreur lors de la mise à jour du profil', 'error');
         console.error('Erreur de mise à jour:', error);
       }
     });
@@ -216,7 +250,7 @@ export class profilAComponent implements OnInit {
         console.error('Statut:', error.status);
         console.error('Message d\'erreur:', error.message);
         
-        this.showMessage('Erreur lors du téléchargement de l\'avatar');
+        this.showNotificationMessage('Erreur lors du téléchargement de l\'avatar', 'error');
         this.uploadingAvatar = false;
       }
     });
@@ -286,27 +320,22 @@ export class profilAComponent implements OnInit {
 
     this.profileService.changePassword(this.userProfile.identifiant, passwordData).subscribe({
       next: () => {
-        this.showMessage('Mot de passe modifié avec succès');
-        this.togglePasswordForm();
+        this.showNotificationMessage('Mot de passe modifié avec succès', 'success');
+        this.togglePasswordModal();
       },
       error: (error) => {
         if (error.status === 401) {
           this.passwordError.currentPassword = 'Mot de passe actuel incorrect';
         } else {
-          this.showMessage('Erreur lors de la modification du mot de passe');
+          this.showNotificationMessage('Erreur lors de la modification du mot de passe', 'error');
         }
         console.error('Erreur de modification du mot de passe:', error);
       }
     });
   }
 
-
-
+  
   showMessage(message: string) {
-    this.toast.message = message;
-    this.toast.show = true;
-    setTimeout(() => {
-      this.toast.show = false;
-    }, 3000);
+    this.showNotificationMessage(message, message.includes('Erreur') ? 'error' : 'success');
   }
 }

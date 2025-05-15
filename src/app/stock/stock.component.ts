@@ -79,6 +79,12 @@ export class StockComponent implements OnInit, OnDestroy {
   public isCommercialAgent: boolean = false;
   public isTechnicalAgent: boolean = false;
   
+  // Ajout des propriétés pour les messages de notification
+  showNotification: boolean = false;
+  notificationMessage: string = '';
+  notificationType: 'success' | 'error' | 'warning' = 'success';
+  notificationTimeout: any = null;
+  
   // Role constants from login component
   private readonly ROLE_ADMIN = 1;
   private readonly ROLE_AGENT_COMMERCIAL = 2;
@@ -131,6 +137,29 @@ export class StockComponent implements OnInit, OnDestroy {
     if (this.reservationSubscription) {
       this.reservationSubscription.unsubscribe();
     }
+    
+    // Nettoyer le timeout de notification si existant
+    if (this.notificationTimeout) {
+      clearTimeout(this.notificationTimeout);
+    }
+  }
+
+  // Méthode pour afficher les notifications
+  showNotificationMessage(message: string, type: 'success' | 'error' | 'warning' = 'success', duration: number = 3000) {
+    // Annuler tout timeout existant
+    if (this.notificationTimeout) {
+      clearTimeout(this.notificationTimeout);
+    }
+    
+    // Définir le message et afficher la notification
+    this.notificationMessage = message;
+    this.notificationType = type;
+    this.showNotification = true;
+    
+    // Masquer automatiquement après la durée spécifiée
+    this.notificationTimeout = setTimeout(() => {
+      this.showNotification = false;
+    }, duration);
   }
 
   private initStock(): Stock {
@@ -175,6 +204,7 @@ export class StockComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error('Erreur lors du chargement des stocks', error);
+        this.showNotificationMessage('Erreur lors du chargement des stocks', 'error');
       }
     });
   }
@@ -282,22 +312,31 @@ export class StockComponent implements OnInit, OnDestroy {
   }
 
   // Confirmer la suppression
-  deleteStockConfirmed(): void {
-    if (this.stockToDelete) {
-      this.stockService.deleteStock(this.stockToDelete.id).subscribe(
-        () => {
-          this.stocks = this.stocks.filter(s => s.id !== this.stockToDelete?.id);
-          this.filteredStocks = this.filteredStocks.filter(s => s.id !== this.stockToDelete?.id);
-          this.updatePagination();
-          this.cancelDelete();
-        },
-        (error) => {
-          console.error('Erreur lors de la suppression', error);
-          this.cancelDelete();
-        }
-      );
-    }
+ deleteStockConfirmed(): void {
+  if (this.stockToDelete) {
+    // Sauvegarder le nom de l'article avant de le supprimer
+    const articleName = this.stockToDelete.article;
+    
+    this.stockService.deleteStock(this.stockToDelete.id).subscribe(
+      () => {
+        this.stocks = this.stocks.filter(s => s.id !== this.stockToDelete?.id);
+        this.filteredStocks = this.filteredStocks.filter(s => s.id !== this.stockToDelete?.id);
+        this.updatePagination();
+        this.cancelDelete();
+        
+        // Afficher un message de confirmation avec le nom sauvegardé
+        this.showNotificationMessage(`L'article ${articleName} a été supprimé avec succès`, 'success');
+      },
+      (error) => {
+        console.error('Erreur lors de la suppression', error);
+        this.cancelDelete();
+        
+        // Afficher un message d'erreur
+        this.showNotificationMessage(`Erreur lors de la suppression: ${this.getErrorMessage(error)}`, 'error');
+      }
+    );
   }
+}
 
   // Annuler la suppression
   cancelDelete(): void {
@@ -317,10 +356,15 @@ export class StockComponent implements OnInit, OnDestroy {
             this.applyFilters();
           }
           this.closeStockModal();
+          
+          // Afficher un message de confirmation
+          this.showNotificationMessage(`L'article ${updatedStock.article} a été mis à jour avec succès`, 'success');
         },
         error: (error) => {
           console.error('Erreur lors de la mise à jour', error);
-          alert("Erreur lors de la mise à jour: " + this.getErrorMessage(error));
+          
+          // Afficher un message d'erreur
+          this.showNotificationMessage(`Erreur lors de la mise à jour: ${this.getErrorMessage(error)}`, 'error');
         }
       });
     } else {
@@ -329,83 +373,20 @@ export class StockComponent implements OnInit, OnDestroy {
           this.stocks.push(newStock);
           this.applyFilters();
           this.closeStockModal();
+          
+          // Afficher un message de confirmation
+          this.showNotificationMessage(`L'article ${newStock.article} a été ajouté avec succès`, 'success');
         },
         error: (error) => {
           console.error("Erreur lors de l'ajout du stock", error);
-          alert("Erreur lors de l'ajout: " + this.getErrorMessage(error));
+          
+          // Afficher un message d'erreur
+          this.showNotificationMessage(`Erreur lors de l'ajout: ${this.getErrorMessage(error)}`, 'error');
         }
       });
     }
   }
-  
-// Ouvrir le modal de réservation
-openReservationModal(stock?: Stock): void {
-  // Vérifier s'il y a des détails de réservation disponibles dans le service
-  const reservationDetails = this.stockService.getReservationDetails();
-  
-  if (reservationDetails) {
-    console.log('Détails de réservation trouvés:', reservationDetails);
-    // Si des détails de réservation existent, afficher le modal de confirmation
-    this.reservationDetails = reservationDetails;
-    this.showReservationConfirmModal = true;
-    return;
-  } else {
-    console.log('Aucun détail de réservation trouvé');
-  }
-  
-  // Sinon, continuer avec le comportement existant
-  if (stock) {
-    this.stockToReserve = stock;
-  } else if (this.stocks.length > 0) {
-    // Par défaut, sélectionnez le premier stock si aucun n'est spécifié
-    this.stockToReserve = this.stocks[0];
-  } else {
-    alert("Aucun stock disponible pour réservation");
-    return;
-  }
-  
-  this.reservationQuantity = 1;
-  this.reservationDate = new Date().toISOString().split('T')[0];
-  this.reservationComment = '';
-  this.showReservationModal = true;
-}
-  // Confirmer la réservation depuis le modal de confirmation
-  confirmReservation(): void {
-    if (!this.reservationDetails) return;
-    
-    console.log('Réservation confirmée:', this.reservationDetails);
-    
-    // Ici vous effectueriez l'action réelle de réservation
-    // Par exemple, mettre à jour le stock, enregistrer dans la base de données, etc.
-    
-    // Trouver l'article correspondant dans le stock (si nécessaire)
-    const stockItem = this.stocks.find(s => 
-      s.article.toLowerCase() === this.reservationDetails?.article.toLowerCase() &&
-      s.constructeur.toLowerCase() === this.reservationDetails?.constructeur.toLowerCase() &&
-      s.categorie.toLowerCase() === this.reservationDetails?.categorie.toLowerCase()
-    );
-    
-    if (stockItem) {
-      // Vous pourriez par exemple mettre à jour la quantité ici
-      // stockItem.quantite -= 1; // Diminuer le stock
-      
-      // Et mettre à jour le stock en base de données
-      // this.stockService.updateStock(stockItem.id, stockItem).subscribe(...);
-    }
-    
-    // Afficher un message de confirmation
-    alert(`Réservation pour le projet ${this.reservationDetails.nomProjet} effectuée avec succès.`);
-    
-    // Fermer le modal et effacer les détails
-    this.showReservationConfirmModal = false;
-    this.stockService.clearReservationDetails();
-  }
 
-  // Annuler la réservation
-  cancelReservation(): void {
-    this.showReservationConfirmModal = false;
-    this.stockService.clearReservationDetails();
-  }
 
   // Méthode d'aide pour extraire des messages d'erreur
   private getErrorMessage(error: any): string {

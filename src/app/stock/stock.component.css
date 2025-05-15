@@ -339,7 +339,7 @@
   padding: 0.5rem;
   border-radius: 0.5rem;
   background-color: rgba(16, 185, 129, 0.1);
-  color: springgreen;
+  color: lightseagreen;
   border: none;
 }
 .action-btn.delete {
@@ -613,4 +613,100 @@
 .modal-content h2{
   color: #4154f1;
 }
+.notification-banner {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 300px;
+  max-width: 600px;
+  padding: 15px 20px;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  animation: slideDown 0.3s ease-out forwards, fadeOut 0.5s ease-out 5s forwards;
+  z-index: 1000;
+}
 
+/* Types de notification */
+.notification-banner.success {
+  background-color: #dff2e4;
+  border-left: 4px solid #28a745;
+  color: #155724;
+}
+
+.notification-banner.error {
+  background-color: #f8d7da;
+  border-left: 4px solid #dc3545;
+  color: #721c24;
+}
+
+.notification-banner.warning {
+  background-color: #fff3cd;
+  border-left: 4px solid #ffc107;
+  color: #856404;
+}
+
+.notification-banner.info {
+  background-color: #d1ecf1;
+  border-left: 4px solid #17a2b8;
+  color: #0c5460;
+}
+
+/* Contenu de la notification */
+.notification-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.notification-content i {
+  font-size: 1.2rem;
+}
+
+.notification-content span {
+  font-weight: 500;
+}
+
+/* Bouton de fermeture */
+.close-notification {
+  background: transparent;
+  border: none;
+  color: inherit;
+  opacity: 0.7;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s;
+}
+
+.close-notification:hover {
+  opacity: 1;
+}
+
+/* Animations pour les notifications */
+@keyframes slideDown {
+  from {
+    transform: translate(-50%, -20px);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
