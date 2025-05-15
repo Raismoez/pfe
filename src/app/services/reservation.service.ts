@@ -49,23 +49,18 @@ export class ReservationService {
   
   // Confirmer une réservation
   confirmReservation(id: number): Observable<Reservation> {
-    const agentEmail = 'meriamdaadaa8@gmail.com';
+    const agentEmail = 'mariem.daadaa@esen.tn';
     return this.http.patch<Reservation>(`${this.apiUrl}/${id}/confirm?email=${agentEmail}`, {});
   }
        
   // Annuler une réservation
   cancelReservation(id: number): Observable<Reservation> {
-    const agentEmail = 'meriamdaadaa8@gmail.com';
+    const agentEmail = 'mariem.daadaa@esen.tn';
     return this.http.patch<Reservation>(`${this.apiUrl}/${id}/cancel?email=${agentEmail}`, {});
   }
   
   // Obtenir les réservations par statut
   getReservationsByStatus(status: 'EN_ATTENTE' | 'CONFIRMEE' | 'ANNULEE'): Observable<Reservation[]> {
     return this.http.get<Reservation[]>(`${this.apiUrl}/status/${status}`);
-  }
-  
-  //  Envoyer l'email de confirmation après confirmation côté back
-  sendConfirmationMail(id: number): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/${id}/sendMail`, null);
   }
 }
