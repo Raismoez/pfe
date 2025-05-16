@@ -76,14 +76,14 @@ export class profilAComponent implements OnInit, OnDestroy {
   }
 
   // Méthode pour afficher les notifications
-  showNotificationMessage(message: string, type: 'success' | 'error' | 'warning' = 'success', duration: number = 5000) {
+  showNotificationMessage(message: string, type: 'success' | 'error' | 'warning' = 'success', duration: number = 3000) {
     // Annuler tout timeout existant
     if (this.notificationTimeout) {
       clearTimeout(this.notificationTimeout);
       this.notificationTimeout = null;
     }
     
-    // Définir le message et afficher la notification
+   
     this.notificationMessage = message;
     this.notificationType = type;
     this.showNotification = true;
@@ -131,7 +131,7 @@ export class profilAComponent implements OnInit, OnDestroy {
   toggleEdit() {
     this.isEditing = !this.isEditing;
     
-    // Si on annule l'édition, on restaure les valeurs originales
+    
     if (!this.isEditing) {
       this.cancelEdit();
     }
@@ -171,11 +171,8 @@ export class profilAComponent implements OnInit, OnDestroy {
         this.showNotificationMessage('Profil mis à jour avec succès', 'success');
         this.originalProfile = {...this.userProfile};
         this.isEditing = false;
+
         
-        // Attendre que la notification soit visible pendant quelques secondes avant de recharger la page
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000); // Recharge la page après 2 secondes
       },
       error: (error) => {
         this.showNotificationMessage('Erreur lors de la mise à jour du profil', 'error');
