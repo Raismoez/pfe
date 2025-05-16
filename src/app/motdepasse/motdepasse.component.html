@@ -8,6 +8,19 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
+    <!-- Notification Banner -->
+    <div *ngIf="showNotification" class="notification-banner" [ngClass]="notificationType">
+        <div class="notification-content">
+            <i class="fas" [ngClass]="{
+                'fa-check-circle': notificationType === 'success',
+            }"></i>
+            <span>{{ notificationMessage }}</span>
+        </div>
+        <button class="close-notification" (click)="showNotification = false">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
     <div class="login-container">
         <img src="logo.png" alt="Logo TT" width="150">
         <h2>Réinitialiser votre Mot De Passe</h2>

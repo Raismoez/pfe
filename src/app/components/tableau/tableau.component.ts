@@ -13,8 +13,8 @@ import { HeaderComponent } from "../header/header.component";
   imports: [CommonModule, HttpClientModule, SidebarComponent, HeaderComponent]
 })
 export class TableauComponent implements OnInit {
-  stockData: StockItem[] = [];          // Données originales complètes
-  filteredData: StockItem[] = [];       // Données filtrées (par recherche)
+  stockData: StockItem[] = [];          
+  filteredData: StockItem[] = [];      
   filteredStockData: StockItem[] = [];  
   
   // Pagination properties
