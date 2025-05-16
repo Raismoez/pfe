@@ -137,20 +137,7 @@ export class profilAComponent implements OnInit, OnDestroy {
     }
   }
   
-  togglePasswordModal() {
-    this.showPasswordModal = !this.showPasswordModal;
-    // Réinitialiser les erreurs et les champs si on ferme le modal
-    if (!this.showPasswordModal) {
-      this.currentPassword = '';
-      this.newPassword = '';
-      this.confirmPassword = '';
-      this.passwordError = {
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
-      };
-    }
-  }
+  
 
   cancelEdit() {
     this.userProfile = {...this.originalProfile};
@@ -256,83 +243,7 @@ export class profilAComponent implements OnInit, OnDestroy {
     });
   }
 
-  togglePasswordForm() {
-    this.showPasswordForm = !this.showPasswordForm;
-    if (!this.showPasswordForm) {
-      this.resetPasswordForm();
-    }
-  }
-
-  resetPasswordForm() {
-    this.currentPassword = '';
-    this.newPassword = '';
-    this.confirmPassword = '';
-    this.passwordError = {
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: ''
-    };
-  }
-
-  validatePasswordForm(): boolean {
-    let isValid = true;
-    this.passwordError = {
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: ''
-    };
-
-    if (!this.currentPassword) {
-      this.passwordError.currentPassword = 'Le mot de passe actuel est requis';
-      isValid = false;
-    }
-
-    if (!this.newPassword) {
-      this.passwordError.newPassword = 'Le nouveau mot de passe est requis';
-      isValid = false;
-    } else if (this.newPassword.length < 8) {
-      this.passwordError.newPassword = 'Le mot de passe doit contenir au moins 8 caractères';
-      isValid = false;
-    }
-
-    if (!this.confirmPassword) {
-      this.passwordError.confirmPassword = 'La confirmation du mot de passe est requise';
-      isValid = false;
-    } else if (this.newPassword !== this.confirmPassword) {
-      this.passwordError.confirmPassword = 'Les mots de passe ne correspondent pas';
-      isValid = false;
-    }
-
-    return isValid;
-  }
-
-  savePassword() {
-    if (!this.validatePasswordForm()) {
-      return;
-    }
-
-    const passwordData = {
-      currentPassword: this.currentPassword,
-      newPassword: this.newPassword,
-      confirmPassword: this.confirmPassword
-    };
-    console.log('Données envoyées:', passwordData);
-
-    this.profileService.changePassword(this.userProfile.identifiant, passwordData).subscribe({
-      next: () => {
-        this.showNotificationMessage('Mot de passe modifié avec succès', 'success');
-        this.togglePasswordModal();
-      },
-      error: (error) => {
-        if (error.status === 401) {
-          this.passwordError.currentPassword = 'Mot de passe actuel incorrect';
-        } else {
-          this.showNotificationMessage('Erreur lors de la modification du mot de passe', 'error');
-        }
-        console.error('Erreur de modification du mot de passe:', error);
-      }
-    });
-  }
+ 
 
   
   showMessage(message: string) {

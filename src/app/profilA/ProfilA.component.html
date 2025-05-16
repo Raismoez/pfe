@@ -99,54 +99,12 @@
             </button>
           </div>
         </form>
-    
-        <div class="security-section" *ngIf="!isEditing">
-          <h3>Sécurité</h3>
-          <div class="security-card">
-            <button class="btn outline password-btn" (click)="togglePasswordModal()">
-              <i class="fas fa-lock"></i> Modifier le mot de passe
-            </button>
-          
-            <!-- Structure HTML pour un formulaire modal de changement de mot de passe -->
-        <div class="modal-overlay" *ngIf="showPasswordModal">
-           <div class="modal-container">
-           <h2>Modifier le mot de passe</h2>
-    
-        <div class="modal-form">
-            <div class="form-group">
-        <label for="currentPassword">Mot de passe actuel</label>
-        <input type="password" id="currentPassword" [(ngModel)]="currentPassword" />
-        <div class="error-message" *ngIf="passwordError.currentPassword">
-          {{ passwordError.currentPassword }}
-        </div>
-      </div>
-      
-      <div class="form-group">
-        <label for="newPassword">Nouveau mot de passe</label>
-        <input type="password" id="newPassword" [(ngModel)]="newPassword" />
-        <div class="error-message" *ngIf="passwordError.newPassword">
-          {{ passwordError.newPassword }}
-        </div>
-      </div>
-      
-      <div class="form-group">
-        <label for="confirmPassword">Confirmer le mot de passe</label>
-        <input type="password" id="confirmPassword" [(ngModel)]="confirmPassword" />
-        <div class="error-message" *ngIf="passwordError.confirmPassword">
-          {{ passwordError.confirmPassword }}
-        </div>
-      </div>
-      
-      <div class="modal-buttons">
-        <button class="btn primary" (click)="savePassword()">Enregistrer</button>
-        <button class="btn secondary" (click)="togglePasswordModal()">Annuler</button>
-      </div>
     </div>
-  </div>
-</div>
-          </div>
-        </div>
-      </div>
+       
+  
+      
+
+      
      
    
-    </div>
+ 
